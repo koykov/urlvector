@@ -31,6 +31,14 @@ func (vec *Vector) ParseCopyStr(s string) error {
 	return vec.parse(fastconv.S2B(s), true)
 }
 
+func (vec *Vector) Scheme() []byte {
+	return vec.Get("scheme").Bytes()
+}
+
+func (vec *Vector) SchemeStr() string {
+	return vec.Get("scheme").String()
+}
+
 func (vec *Vector) Reset() {
 	vec.Vector.Reset()
 	vec.keyAddr = 0
