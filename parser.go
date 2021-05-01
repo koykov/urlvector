@@ -61,9 +61,7 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 
 	offset := 0
 	// Create root node and register it.
-	root := vec.GetNodeWT(0, vector.TypeObj)
-	i := vec.Len() - 1
-	vec.Index.Register(0, i)
+	root, i := vec.GetNodeWT(0, vector.TypeObj)
 	root.SetOffset(vec.Index.Len(1))
 
 	if offset, err = vec.parseScheme(1, offset, root); err != nil {
@@ -90,6 +88,9 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
+	scheme, isc := vec.GetChildWT(node, depth, vector.TypeStr)
+	slashes, isl := vec.GetChildWT(node, depth, vector.TypeBool)
+
 	// max scheme length by https://en.wikipedia.org/wiki/List_of_URI_schemes#Official_IANA-registered_schemes
 	limit := 29
 	if sl := vec.SrcLen(); sl < limit {
@@ -99,59 +100,52 @@ func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error
 		return offset, vector.ErrShortSrc
 	}
 	if pos := bytes.Index(vec.Src(), bSchemaSep); pos > 0 {
-		scheme := vec.GetNodeWT(depth, vector.TypeStr)
-		i := vec.Len() - 1
-		node.SetLimit(vec.Index.Register(depth, i))
 		scheme.Key().Set(vec.keyAddr+offsetScheme, lenScheme)
 		scheme.Value().Set(vec.SrcAddr()+uint64(offset), pos)
-		vec.PutNode(i, scheme)
 		offset += pos + 3
 	} else if bytes.Equal(vec.Src()[:2], bSlashes) {
-		scheme := vec.GetNodeWT(depth, vector.TypeBool)
-		i := vec.Len() - 1
-		node.SetLimit(vec.Index.Register(depth, i))
-		scheme.Key().Set(vec.keyAddr+offsetSlashes, lenSlashes)
-		scheme.Value().Set(vec.keyAddr+offsetTrue, lenTrue)
-		vec.PutNode(i, scheme)
+		slashes.Key().Set(vec.keyAddr+offsetSlashes, lenSlashes)
+		slashes.Value().Set(vec.keyAddr+offsetTrue, lenTrue)
 		offset += 2
 	}
+
+	vec.PutNode(isc, scheme)
+	vec.PutNode(isl, slashes)
 
 	return offset, err
 }
 
 func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) {
 	var err error
+
+	auth, ia := vec.GetChildWT(node, depth, vector.TypeStr)
+	username, iu := vec.GetChildWT(node, depth, vector.TypeStr)
+	password, ip := vec.GetChildWT(node, depth, vector.TypeStr)
+
 	posCol := bytealg.IndexAt(vec.Src(), bColon, offset)
-	if posCol < 0 {
-		return offset, nil
-	}
 	posAt := bytealg.IndexAt(vec.Src(), bAt, posCol)
-	if posAt < 0 || posAt <= posCol {
-		return offset, nil
+
+	if posAt > 0 {
+		auth.Key().Set(vec.keyAddr+offsetAuth, lenAuth)
+		auth.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
+
+		if posCol >= 0 {
+			username.Key().Set(vec.keyAddr+offsetUsername, lenUsername)
+			username.Value().Set(vec.SrcAddr()+uint64(offset), posCol-offset)
+			offset = posCol + 1
+
+			password.Key().Set(vec.keyAddr+offsetPassword, lenPassword)
+			password.Value().Set(vec.SrcAddr()+uint64(offset), posAt-posCol-1)
+		} else {
+			username.Key().Set(vec.keyAddr+offsetUsername, lenUsername)
+			username.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
+		}
+		offset = posAt
 	}
 
-	auth := vec.GetNodeWT(depth, vector.TypeStr)
-	i := vec.Len() - 1
-	node.SetLimit(vec.Index.Register(depth, i))
-	auth.Key().Set(vec.keyAddr+offsetAuth, lenAuth)
-	auth.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
-	vec.PutNode(i, auth)
-
-	username := vec.GetNodeWT(depth, vector.TypeStr)
-	i = vec.Len() - 1
-	node.SetLimit(vec.Index.Register(depth, i))
-	username.Key().Set(vec.keyAddr+offsetUsername, lenUsername)
-	username.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
-	vec.PutNode(i, username)
-
-	password := vec.GetNodeWT(depth, vector.TypeStr)
-	i = vec.Len() - 1
-	node.SetLimit(vec.Index.Register(depth, i))
-	password.Key().Set(vec.keyAddr+offsetPassword, lenPassword)
-	password.Value().Set(vec.SrcAddr()+uint64(offset+posCol), posAt-posCol-offset)
-	vec.PutNode(i, password)
-
-	offset += posAt
+	vec.PutNode(ia, auth)
+	vec.PutNode(iu, username)
+	vec.PutNode(ip, password)
 
 	return offset, err
 }

@@ -39,6 +39,34 @@ func (vec *Vector) SchemeStr() string {
 	return vec.Get("scheme").String()
 }
 
+func (vec *Vector) Slashes() bool {
+	return vec.Get("slashed").Bool()
+}
+
+func (vec *Vector) Auth() []byte {
+	return vec.Get("auth").Bytes()
+}
+
+func (vec *Vector) AuthStr() string {
+	return vec.Get("auth").String()
+}
+
+func (vec *Vector) Username() []byte {
+	return vec.Get("username").Bytes()
+}
+
+func (vec *Vector) UsernameStr() string {
+	return vec.Get("username").String()
+}
+
+func (vec *Vector) Password() []byte {
+	return vec.Get("password").Bytes()
+}
+
+func (vec *Vector) PasswordStr() string {
+	return vec.Get("password").String()
+}
+
 func (vec *Vector) Reset() {
 	vec.Vector.Reset()
 	vec.keyAddr = 0
