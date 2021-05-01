@@ -72,6 +72,10 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 		vec.SetErrOffset(offset)
 		return
 	}
+	if offset, err = vec.parseHost(1, offset, root); err != nil {
+		vec.SetErrOffset(offset)
+		return
+	}
 
 	vec.PutNode(i, root)
 
@@ -140,12 +144,50 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 			username.Key().Set(vec.keyAddr+offsetUsername, lenUsername)
 			username.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
 		}
-		offset = posAt
+		offset = posAt + 1
 	}
 
 	vec.PutNode(ia, auth)
 	vec.PutNode(iu, username)
 	vec.PutNode(ip, password)
+
+	return offset, err
+}
+
+func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) {
+	var err error
+
+	host, ih := vec.GetChildWT(node, depth, vector.TypeStr)
+	hostname, in := vec.GetChildWT(node, depth, vector.TypeStr)
+	port, ip := vec.GetChildWT(node, depth, vector.TypeNum)
+
+	posSl := bytealg.IndexAt(vec.Src(), bSlash, offset)
+	posCol := bytealg.IndexAt(vec.Src(), bColon, offset)
+
+	if posSl < 0 {
+		posSl = vec.SrcLen() - 1
+	}
+
+	host.Key().Set(vec.keyAddr+offsetHost, lenHost)
+	host.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
+
+	if posCol >= 0 {
+		hostname.Key().Set(vec.keyAddr+offsetHostname, lenHostname)
+		hostname.Value().Set(vec.SrcAddr()+uint64(offset), posCol-offset)
+		offset = posCol + 1
+
+		port.Key().Set(vec.keyAddr+offsetPort, lenPort)
+		port.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
+	} else {
+		hostname.Key().Set(vec.keyAddr+offsetHostname, lenHostname)
+		hostname.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
+	}
+
+	vec.PutNode(ih, host)
+	vec.PutNode(in, hostname)
+	vec.PutNode(ip, port)
+
+	offset = posSl
 
 	return offset, err
 }
