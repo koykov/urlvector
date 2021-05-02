@@ -88,6 +88,14 @@ func (vec *Vector) Port() int {
 	return int(i)
 }
 
+func (vec *Vector) Pathname() []byte {
+	return vec.Get("pathname").Bytes()
+}
+
+func (vec *Vector) PathnameStr() string {
+	return vec.Get("pathname").String()
+}
+
 func (vec *Vector) Reset() {
 	vec.Vector.Reset()
 	vec.keyAddr = 0

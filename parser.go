@@ -46,6 +46,7 @@ var (
 	bSlash     = []byte("/")
 	bColon     = []byte(":")
 	bAt        = []byte("@")
+	bQM        = []byte("?")
 
 	bIndex = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryhashhreftrue")
 )
@@ -73,6 +74,10 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 		return
 	}
 	if offset, err = vec.parseHost(1, offset, root); err != nil {
+		vec.SetErrOffset(offset)
+		return
+	}
+	if offset, err = vec.parsePathname(1, offset, root); err != nil {
 		vec.SetErrOffset(offset)
 		return
 	}
@@ -188,6 +193,22 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 	vec.PutNode(ip, port)
 
 	offset = posSl
+
+	return offset, err
+}
+
+func (vec *Vector) parsePathname(depth, offset int, node *vector.Node) (int, error) {
+	var err error
+
+	pathname, i := vec.GetChildWT(node, depth, vector.TypeStr)
+
+	if posQM := bytealg.IndexAt(vec.Src(), bQM, offset); posQM >= 0 {
+		pathname.Key().Set(vec.keyAddr+offsetPathname, lenPathname)
+		pathname.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
+		offset = posQM
+	}
+
+	vec.PutNode(i, pathname)
 
 	return offset, err
 }

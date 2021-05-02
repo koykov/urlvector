@@ -3,7 +3,7 @@ package urlvector
 import "testing"
 
 var (
-	url0 = []byte("https://john_ruth:hangman17@github.com:3306/foo/bar")
+	url0 = []byte("https://john_ruth:hangman17@99.99.99.99:3306/foo/bar?that\\'s#all, folks")
 
 	vec = NewVector()
 )
@@ -19,6 +19,7 @@ func TestVector_Parse(t *testing.T) {
 	t.Log(vec.HostStr())
 	t.Log(vec.HostnameStr())
 	t.Log(vec.Port())
+	t.Log(vec.PathnameStr())
 	if err != nil {
 		// t.Error(err)
 	}
