@@ -88,12 +88,12 @@ func (vec *Vector) Port() int {
 	return int(i)
 }
 
-func (vec *Vector) Pathname() []byte {
-	return vec.Get("pathname").Bytes()
+func (vec *Vector) Path() []byte {
+	return vec.Get("path").Bytes()
 }
 
-func (vec *Vector) PathnameStr() string {
-	return vec.Get("pathname").String()
+func (vec *Vector) PathStr() string {
+	return vec.Get("path").String()
 }
 
 func (vec *Vector) Reset() {

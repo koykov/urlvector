@@ -18,7 +18,7 @@ const (
 	offsetHost     = 33
 	offsetHostname = 37
 	offsetPort     = 45
-	offsetPathname = 49
+	offsetPath     = 49
 	offsetQuery    = 57
 	offsetHash     = 62
 	offsetHref     = 66
@@ -32,7 +32,7 @@ const (
 	lenHost     = 4
 	lenHostname = 8
 	lenPort     = 4
-	lenPathname = 8
+	lenPath     = 4
 	lenQuery    = 5
 	lenHash     = 4
 	lenHref     = 4
@@ -77,7 +77,7 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 		vec.SetErrOffset(offset)
 		return
 	}
-	if offset, err = vec.parsePathname(1, offset, root); err != nil {
+	if offset, err = vec.parsePath(1, offset, root); err != nil {
 		vec.SetErrOffset(offset)
 		return
 	}
@@ -197,15 +197,17 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 	return offset, err
 }
 
-func (vec *Vector) parsePathname(depth, offset int, node *vector.Node) (int, error) {
+func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
 	pathname, i := vec.GetChildWT(node, depth, vector.TypeStr)
 
-	if posQM := bytealg.IndexAt(vec.Src(), bQM, offset); posQM >= 0 {
-		pathname.Key().Set(vec.keyAddr+offsetPathname, lenPathname)
-		pathname.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
-		offset = posQM
+	if offset < vec.SrcLen() {
+		if posQM := bytealg.IndexAt(vec.Src(), bQM, offset); posQM >= 0 {
+			pathname.Key().Set(vec.keyAddr+offsetPath, lenPath)
+			pathname.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
+			offset = posQM
+		}
 	}
 
 	vec.PutNode(i, pathname)
