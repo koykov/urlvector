@@ -96,6 +96,14 @@ func (vec *Vector) PathStr() string {
 	return vec.Get("path").String()
 }
 
+func (vec *Vector) Query() []byte {
+	return vec.Get("query").Bytes()
+}
+
+func (vec *Vector) QueryStr() string {
+	return vec.Get("query").String()
+}
+
 func (vec *Vector) Reset() {
 	vec.Vector.Reset()
 	vec.keyAddr = 0

@@ -47,6 +47,7 @@ var (
 	bColon     = []byte(":")
 	bAt        = []byte("@")
 	bQM        = []byte("?")
+	bHash      = []byte("#")
 
 	bIndex = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryhashhreftrue")
 )
@@ -78,6 +79,10 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 		return
 	}
 	if offset, err = vec.parsePath(1, offset, root); err != nil {
+		vec.SetErrOffset(offset)
+		return
+	}
+	if offset, err = vec.parseQuery(1, offset, root); err != nil {
 		vec.SetErrOffset(offset)
 		return
 	}
@@ -200,17 +205,37 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
-	pathname, i := vec.GetChildWT(node, depth, vector.TypeStr)
+	path, i := vec.GetChildWT(node, depth, vector.TypeStr)
 
 	if offset < vec.SrcLen() {
 		if posQM := bytealg.IndexAt(vec.Src(), bQM, offset); posQM >= 0 {
-			pathname.Key().Set(vec.keyAddr+offsetPath, lenPath)
-			pathname.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
+			path.Key().Set(vec.keyAddr+offsetPath, lenPath)
+			path.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
 			offset = posQM
 		}
 	}
 
-	vec.PutNode(i, pathname)
+	vec.PutNode(i, path)
+
+	return offset, err
+}
+
+func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error) {
+	var err error
+
+	query, i := vec.GetChildWT(node, depth, vector.TypeStr)
+
+	if offset < vec.SrcLen() {
+		posHash := bytealg.IndexAt(vec.Src(), bHash, offset)
+		if posHash < 0 {
+			posHash = vec.SrcLen() - 1
+		}
+		query.Key().Set(vec.keyAddr+offsetQuery, lenQuery)
+		query.Value().Set(vec.SrcAddr()+uint64(offset), posHash-offset)
+		offset = posHash
+	}
+
+	vec.PutNode(i, query)
 
 	return offset, err
 }

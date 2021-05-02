@@ -20,6 +20,7 @@ func TestVector_Parse(t *testing.T) {
 	t.Log(vec.HostnameStr())
 	t.Log(vec.Port())
 	t.Log(vec.PathStr())
+	t.Log(vec.QueryStr())
 	if err != nil {
 		// t.Error(err)
 	}
