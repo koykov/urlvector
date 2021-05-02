@@ -21,6 +21,7 @@ func TestVector_Parse(t *testing.T) {
 	t.Log(vec.Port())
 	t.Log(vec.PathStr())
 	t.Log(vec.QueryStr())
+	t.Log(vec.HashStr())
 	if err != nil {
 		// t.Error(err)
 	}

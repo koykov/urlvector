@@ -104,6 +104,14 @@ func (vec *Vector) QueryStr() string {
 	return vec.Get("query").String()
 }
 
+func (vec *Vector) Hash() []byte {
+	return vec.Get("hash").Bytes()
+}
+
+func (vec *Vector) HashStr() string {
+	return vec.Get("hash").String()
+}
+
 func (vec *Vector) Reset() {
 	vec.Vector.Reset()
 	vec.keyAddr = 0

@@ -223,19 +223,24 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
-	query, i := vec.GetChildWT(node, depth, vector.TypeStr)
+	query, iq := vec.GetChildWT(node, depth, vector.TypeStr)
+	hash, ih := vec.GetChildWT(node, depth, vector.TypeStr)
 
 	if offset < vec.SrcLen() {
 		posHash := bytealg.IndexAt(vec.Src(), bHash, offset)
 		if posHash < 0 {
-			posHash = vec.SrcLen() - 1
+			posHash = vec.SrcLen()
+		} else {
+			hash.Key().Set(vec.keyAddr+offsetHash, lenHash)
+			hash.Value().Set(vec.SrcAddr()+uint64(posHash), vec.SrcLen()-posHash)
 		}
 		query.Key().Set(vec.keyAddr+offsetQuery, lenQuery)
 		query.Value().Set(vec.SrcAddr()+uint64(offset), posHash-offset)
 		offset = posHash
 	}
 
-	vec.PutNode(i, query)
+	vec.PutNode(iq, query)
+	vec.PutNode(ih, hash)
 
 	return offset, err
 }
