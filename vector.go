@@ -40,7 +40,7 @@ func (vec *Vector) SchemeStr() string {
 }
 
 func (vec *Vector) Slashes() bool {
-	return vec.Get("slashed").Bool()
+	return vec.Get("slashes").Bool()
 }
 
 func (vec *Vector) Auth() []byte {

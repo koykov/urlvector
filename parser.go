@@ -47,7 +47,7 @@ var (
 	bQM        = []byte("?")
 	bHash      = []byte("#")
 
-	bIndex = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryhashhreftrue")
+	bIndex = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryhashtrue")
 )
 
 func (vec *Vector) parse(s []byte, copy bool) (err error) {
