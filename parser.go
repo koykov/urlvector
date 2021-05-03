@@ -173,7 +173,7 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 	posCol := bytealg.IndexAt(vec.Src(), bColon, offset)
 
 	if posSl < 0 {
-		posSl = vec.SrcLen() - 1
+		posSl = vec.SrcLen()
 	}
 
 	host.Key().Set(vec.keyAddr+offsetHost, lenHost)
