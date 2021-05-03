@@ -236,7 +236,7 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 		}
 		query.Key().Set(vec.keyAddr+offsetQuery, lenQuery)
 		query.Value().Set(vec.SrcAddr()+uint64(offset), posHash-offset)
-		offset = posHash
+		offset = vec.SrcLen()
 	}
 
 	vec.PutNode(iq, query)
