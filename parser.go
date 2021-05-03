@@ -206,11 +206,13 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 	path, i := vec.GetChildWT(node, depth, vector.TypeStr)
 
 	if offset < vec.SrcLen() {
-		if posQM := bytealg.IndexAt(vec.Src(), bQM, offset); posQM >= 0 {
-			path.Key().Set(vec.keyAddr+offsetPath, lenPath)
-			path.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
-			offset = posQM
+		posQM := bytealg.IndexAt(vec.Src(), bQM, offset)
+		if posQM < 0 {
+			posQM = vec.SrcLen()
 		}
+		path.Key().Set(vec.keyAddr+offsetPath, lenPath)
+		path.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
+		offset = posQM
 	}
 
 	vec.PutNode(i, path)
