@@ -21,8 +21,7 @@ const (
 	offsetPath     = 49
 	offsetQuery    = 57
 	offsetHash     = 62
-	offsetHref     = 66
-	offsetTrue     = 70
+	offsetTrue     = 66
 
 	lenScheme   = 6
 	lenSlashes  = 7
@@ -35,7 +34,6 @@ const (
 	lenPath     = 4
 	lenQuery    = 5
 	lenHash     = 4
-	lenHref     = 4
 	lenTrue     = 4
 )
 
