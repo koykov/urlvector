@@ -42,6 +42,46 @@ var (
 			"foo\\nbar\\rbaz\\u2028qux\\u2029",
 			testTarget{err: vector.ErrUnparsedTail, errOff: 0},
 		},
+		{
+			" javascript://foo",
+			testTarget{scheme: "javascript", host: "foo"},
+		},
+		{
+			"http://google.com/?foo=bar",
+			testTarget{scheme: "http", host: "google.com", query: "?foo=bar"},
+		},
+		{
+			"http://google.com/?lolcakes",
+			testTarget{scheme: "http", host: "google.com", query: "?lolcakes"},
+		},
+		// {
+		// 	"blob:https%3A//gist.github.com/3f272586-6dac-4e29-92d0-f674f2dde618"
+		// 	testTarget{},
+		// },
+		{
+			"https://www.mozilla.org/en-US/firefox/34.0/whatsnew/?oldversion=33.1",
+			testTarget{scheme: "https", host: "www.mozilla.org", path: "/en-US/firefox/34.0/whatsnew/", query: "?oldversion=33.1"},
+		},
+		{
+			"http://example.com:80",
+			testTarget{host: "example.com:80"},
+		},
+		{
+			"http://example.com:80/",
+			testTarget{host: "example.com:80", path: "/"},
+		},
+		{
+			"http://x.com/path?that\\'s#all, folks",
+			testTarget{host: "x.com", path: "/path", query: "?that\\'s", hash: "#all, folks"},
+		},
+		{
+			"http://google.com:80\\\\@yahoo.com/#what\\\\is going on",
+			testTarget{username: "google.com", password: "80\\\\", host: "yahoo.com", hash: "#what\\\\is going on"},
+		},
+		// {
+		// 	"http://yolo.com\\\\what-is-up.com",
+		// 	testTarget{path: "/what-is-up.com"},
+		// },
 	}
 	// url0 = []byte("https://john_ruth:hangman17@99.99.99.99:3306/foo/bar?that\\'s#all, folks")
 
