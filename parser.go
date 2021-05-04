@@ -207,8 +207,13 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 
 	if offset < vec.SrcLen() {
 		posQM := bytealg.IndexAt(vec.Src(), bQM, offset)
+		posHash := bytealg.IndexAt(vec.Src(), bHash, offset)
 		if posQM < 0 {
-			posQM = vec.SrcLen()
+			if posHash >= 0 {
+				posQM = posHash
+			} else {
+				posQM = vec.SrcLen()
+			}
 		}
 		path.Key().Set(vec.keyAddr+offsetPath, lenPath)
 		path.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
