@@ -135,7 +135,7 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 	password, ip := vec.GetChildWT(node, depth, vector.TypeStr)
 
 	posCol := bytealg.IndexAt(vec.Src(), bColon, offset)
-	posAt := bytealg.IndexAt(vec.Src(), bAt, posCol)
+	posAt := bytealg.IndexAt(vec.Src(), bAt, max(posCol, offset))
 
 	if posAt > 0 {
 		auth.Key().Set(vec.keyAddr+offsetAuth, lenAuth)
@@ -254,4 +254,11 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 	vec.PutNode(ih, hash)
 
 	return offset, err
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
