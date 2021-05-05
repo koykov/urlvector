@@ -82,6 +82,41 @@ var (
 		// 	"http://yolo.com\\\\what-is-up.com",
 		// 	testTarget{path: "/what-is-up.com"},
 		// },
+		{
+			"HTTP://example.com",
+			testTarget{scheme: "HTTP"}, // fixme must be "http"!
+		},
+		{
+			"google.com/foo",
+			testTarget{scheme: "", host: "google.com", path: "/foo"},
+		},
+		{
+			"http://[1080:0:0:0:8:800:200C:417A]:61616/foo/bar?q=z",
+			testTarget{host: "[1080:0:0:0:8:800:200C:417A]:61616", hostname: "[1080:0:0:0:8:800:200C:417A]", port: 61616},
+		},
+		{
+			"http://user:password@[3ffe:2a00:100:7031::1]:8080/",
+			testTarget{username: "user", password: "password", hostname: "[3ffe:2a00:100:7031::1]", port: 8080},
+		},
+		{
+			"http://222.148.142.13:61616/foo/bar?q=z",
+			testTarget{hostname: "222.148.142.13", port: 61616, path: "/foo/bar", query: "?q=z"},
+		},
+		{
+			"HTTP://USER:PASS@EXAMPLE.COM",
+			testTarget{
+				scheme:   "HTTP", // fixme must be "http"!
+				username: "USER", password: "PASS", host: "EXAMPLE.COM",
+			},
+		},
+		{
+			"http://mt0.google.com/vt/lyrs=m@114&hl=en&src=api&x=2&y=2&z=3&s=",
+			testTarget{path: "/vt/lyrs=m@114&hl=en&src=api&x=2&y=2&z=3&s="},
+		},
+		{
+			"http://user@www.example.com/",
+			testTarget{username: "user", host: "www.example.com"},
+		},
 	}
 	// url0 = []byte("https://john_ruth:hangman17@99.99.99.99:3306/foo/bar?that\\'s#all, folks")
 
