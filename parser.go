@@ -136,6 +136,9 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 
 	posCol := bytealg.IndexAt(vec.Src(), bColon, offset)
 	posAt := bytealg.IndexAt(vec.Src(), bAt, max(posCol, offset))
+	if posSl := bytealg.IndexAt(vec.Src(), bSlash, offset); posSl >= 0 && posSl < posAt {
+		posAt = -1
+	}
 
 	if posAt > 0 {
 		auth.Key().Set(vec.keyAddr+offsetAuth, lenAuth)
