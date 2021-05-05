@@ -170,10 +170,16 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 	port, ip := vec.GetChildWT(node, depth, vector.TypeNum)
 
 	posSl := bytealg.IndexAt(vec.Src(), bSlash, offset)
-	posCol := bytealg.IndexAt(vec.Src(), bColon, offset)
-
 	if posSl < 0 {
 		posSl = vec.SrcLen()
+	}
+	posCol := -1
+	i := offset
+loop:
+	i = bytealg.IndexAt(vec.Src(), bColon, i+1)
+	if i >= 0 && i < posSl {
+		posCol = i
+		goto loop
 	}
 
 	host.Key().Set(vec.keyAddr+offsetHost, lenHost)
