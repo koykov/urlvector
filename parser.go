@@ -43,6 +43,7 @@ var (
 	bSchemaSep = []byte("://")
 	bSlashes   = []byte("//")
 	bSlash     = []byte("/")
+	bBSlash    = []byte("\\")
 	bColon     = []byte(":")
 	bAt        = []byte("@")
 	bQM        = []byte("?")
@@ -178,7 +179,11 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 
 	posSl := bytealg.IndexAt(vec.Src(), bSlash, offset)
 	if posSl < 0 {
-		posSl = vec.SrcLen()
+		if posBSl := bytealg.IndexAt(vec.Src(), bBSlash, offset); posBSl >= 0 {
+			posSl = posBSl
+		} else {
+			posSl = vec.SrcLen()
+		}
 	}
 	posCol := -1
 	i := offset
