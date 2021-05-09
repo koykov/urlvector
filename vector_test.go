@@ -54,10 +54,10 @@ var (
 			"http://google.com/?lolcakes",
 			testTarget{scheme: "http", host: "google.com", query: "?lolcakes"},
 		},
-		// {
-		// 	"blob:https%3A//gist.github.com/3f272586-6dac-4e29-92d0-f674f2dde618"
-		// 	testTarget{},
-		// },
+		{
+			"blob:https://gist.github.com/3f272586-6dac-4e29-92d0-f674f2dde618",
+			testTarget{scheme: "https", host: "gist.github.com", path: "/3f272586-6dac-4e29-92d0-f674f2dde618"},
+		},
 		{
 			"https://www.mozilla.org/en-US/firefox/34.0/whatsnew/?oldversion=33.1",
 			testTarget{scheme: "https", host: "www.mozilla.org", path: "/en-US/firefox/34.0/whatsnew/", query: "?oldversion=33.1"},

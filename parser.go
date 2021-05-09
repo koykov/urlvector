@@ -39,6 +39,7 @@ const (
 
 var (
 	bSpace     = []byte(" ")
+	bBlob      = []byte("blob:")
 	bSchemaSep = []byte("://")
 	bSlashes   = []byte("//")
 	bSlash     = []byte("/")
@@ -52,6 +53,9 @@ var (
 
 func (vec *Vector) parse(s []byte, copy bool) (err error) {
 	s = bytealg.Trim(s, bSpace)
+	if len(s) >= 5 && bytes.Equal(s[:5], bBlob) {
+		s = s[5:]
+	}
 	if err = vec.SetSrc(s, copy); err != nil {
 		return
 	}
