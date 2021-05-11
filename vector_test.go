@@ -138,38 +138,38 @@ func TestVector_Parse(t *testing.T) {
 			continue
 		}
 
-		if len(tst.target.scheme) > 0 && vec.SchemeStr() != tst.target.scheme {
-			printErr(t, &tst, "scheme mismatch", vec.SchemeStr(), "vs", tst.target.scheme)
+		if len(tst.target.scheme) > 0 && vec.SchemeString() != tst.target.scheme {
+			printErr(t, &tst, "scheme mismatch", vec.SchemeString(), "vs", tst.target.scheme)
 		}
 		if tst.target.slashes && vec.Slashes() != tst.target.slashes {
 			printErr(t, &tst, "slashes mismatch", vec.Slashes(), "vs", tst.target.slashes)
 		}
-		if len(tst.target.auth) > 0 && vec.AuthStr() != tst.target.auth {
-			printErr(t, &tst, "auth mismatch", vec.AuthStr(), "vs", tst.target.auth)
+		if len(tst.target.auth) > 0 && vec.AuthString() != tst.target.auth {
+			printErr(t, &tst, "auth mismatch", vec.AuthString(), "vs", tst.target.auth)
 		}
-		if len(tst.target.username) > 0 && vec.UsernameStr() != tst.target.username {
-			printErr(t, &tst, "username mismatch", vec.UsernameStr(), "vs", tst.target.username)
+		if len(tst.target.username) > 0 && vec.UsernameString() != tst.target.username {
+			printErr(t, &tst, "username mismatch", vec.UsernameString(), "vs", tst.target.username)
 		}
-		if len(tst.target.password) > 0 && vec.PasswordStr() != tst.target.password {
-			printErr(t, &tst, "password mismatch", vec.PasswordStr(), "vs", tst.target.password)
+		if len(tst.target.password) > 0 && vec.PasswordString() != tst.target.password {
+			printErr(t, &tst, "password mismatch", vec.PasswordString(), "vs", tst.target.password)
 		}
-		if len(tst.target.host) > 0 && vec.HostStr() != tst.target.host {
-			printErr(t, &tst, "host mismatch", vec.HostStr(), "vs", tst.target.host)
+		if len(tst.target.host) > 0 && vec.HostString() != tst.target.host {
+			printErr(t, &tst, "host mismatch", vec.HostString(), "vs", tst.target.host)
 		}
-		if len(tst.target.hostname) > 0 && vec.HostnameStr() != tst.target.hostname {
-			printErr(t, &tst, "hostname mismatch", vec.HostnameStr(), "vs", tst.target.hostname)
+		if len(tst.target.hostname) > 0 && vec.HostnameString() != tst.target.hostname {
+			printErr(t, &tst, "hostname mismatch", vec.HostnameString(), "vs", tst.target.hostname)
 		}
 		if tst.target.port > 0 && vec.Port() != tst.target.port {
 			printErr(t, &tst, "port mismatch", vec.Port(), "vs", tst.target.port)
 		}
-		if len(tst.target.path) > 0 && vec.PathStr() != tst.target.path {
-			printErr(t, &tst, "path mismatch", vec.PathStr(), "vs", tst.target.path)
+		if len(tst.target.path) > 0 && vec.PathString() != tst.target.path {
+			printErr(t, &tst, "path mismatch", vec.PathString(), "vs", tst.target.path)
 		}
-		if len(tst.target.query) > 0 && vec.QueryStr() != tst.target.query {
-			printErr(t, &tst, "query mismatch", vec.QueryStr(), "vs", tst.target.query)
+		if len(tst.target.query) > 0 && vec.QueryString() != tst.target.query {
+			printErr(t, &tst, "query mismatch", vec.QueryString(), "vs", tst.target.query)
 		}
-		if len(tst.target.hash) > 0 && vec.HashStr() != tst.target.hash {
-			printErr(t, &tst, "hash mismatch", vec.HashStr(), "vs", tst.target.hash)
+		if len(tst.target.hash) > 0 && vec.HashString() != tst.target.hash {
+			printErr(t, &tst, "hash mismatch", vec.HashString(), "vs", tst.target.hash)
 		}
 	}
 }

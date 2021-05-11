@@ -31,56 +31,32 @@ func (vec *Vector) ParseCopyStr(s string) error {
 	return vec.parse(fastconv.S2B(s), true)
 }
 
-func (vec *Vector) Scheme() []byte {
-	return vec.Get("scheme").Bytes()
-}
-
-func (vec *Vector) SchemeStr() string {
-	return vec.Get("scheme").String()
+func (vec *Vector) Scheme() *vector.Node {
+	return vec.Get("scheme")
 }
 
 func (vec *Vector) Slashes() bool {
 	return vec.Get("slashes").Bool()
 }
 
-func (vec *Vector) Auth() []byte {
-	return vec.Get("auth").Bytes()
+func (vec *Vector) Auth() *vector.Node {
+	return vec.Get("auth")
 }
 
-func (vec *Vector) AuthStr() string {
-	return vec.Get("auth").String()
+func (vec *Vector) Username() *vector.Node {
+	return vec.Get("username")
 }
 
-func (vec *Vector) Username() []byte {
-	return vec.Get("username").Bytes()
+func (vec *Vector) Password() *vector.Node {
+	return vec.Get("password")
 }
 
-func (vec *Vector) UsernameStr() string {
-	return vec.Get("username").String()
+func (vec *Vector) Host() *vector.Node {
+	return vec.Get("host")
 }
 
-func (vec *Vector) Password() []byte {
-	return vec.Get("password").Bytes()
-}
-
-func (vec *Vector) PasswordStr() string {
-	return vec.Get("password").String()
-}
-
-func (vec *Vector) Host() []byte {
-	return vec.Get("host").Bytes()
-}
-
-func (vec *Vector) HostStr() string {
-	return vec.Get("host").String()
-}
-
-func (vec *Vector) Hostname() []byte {
-	return vec.Get("hostname").Bytes()
-}
-
-func (vec *Vector) HostnameStr() string {
-	return vec.Get("hostname").String()
+func (vec *Vector) Hostname() *vector.Node {
+	return vec.Get("hostname")
 }
 
 func (vec *Vector) Port() int {
@@ -88,28 +64,16 @@ func (vec *Vector) Port() int {
 	return int(i)
 }
 
-func (vec *Vector) Path() []byte {
-	return vec.Get("path").Bytes()
+func (vec *Vector) Path() *vector.Node {
+	return vec.Get("path")
 }
 
-func (vec *Vector) PathStr() string {
-	return vec.Get("path").String()
+func (vec *Vector) Query() *vector.Node {
+	return vec.Get("query")
 }
 
-func (vec *Vector) Query() []byte {
-	return vec.Get("query").Bytes()
-}
-
-func (vec *Vector) QueryStr() string {
-	return vec.Get("query").String()
-}
-
-func (vec *Vector) Hash() []byte {
-	return vec.Get("hash").Bytes()
-}
-
-func (vec *Vector) HashStr() string {
-	return vec.Get("hash").String()
+func (vec *Vector) Hash() *vector.Node {
+	return vec.Get("hash")
 }
 
 func (vec *Vector) Reset() {
