@@ -118,16 +118,12 @@ var (
 			testTarget{username: "user", host: "www.example.com"},
 		},
 	}
-	// url0 = []byte("https://john_ruth:hangman17@99.99.99.99:3306/foo/bar?that\\'s#all, folks")
+	url0 = []byte("https://john_ruth:hangman17@99.99.99.99:3306/foo/bar?that\\'s#all, folks")
 
 	vec = NewVector()
 )
 
 func TestVector_Parse(t *testing.T) {
-	printErr := func(t testing.TB, tst *testTargets, args ...interface{}) {
-		t.Error("\nsrc: "+tst.url+"\n", args)
-	}
-
 	for i, tst := range cases {
 		vec.Reset()
 		err := vec.ParseStr(tst.url)
@@ -172,4 +168,69 @@ func TestVector_Parse(t *testing.T) {
 			printErr(t, &tst, "hash mismatch", vec.HashString(), "vs", tst.target.hash)
 		}
 	}
+}
+
+func BenchmarkVector_Parse(b *testing.B) {
+	tst := testTargets{
+		url: string(url0),
+		target: testTarget{
+			scheme:   "https",
+			auth:     "john_ruth:hangman17",
+			username: "john_ruth",
+			password: "hangman17",
+			host:     "99.99.99.99:3306",
+			hostname: "99.99.99.99",
+			path:     "/foo/bar",
+			query:    "?that\\'s",
+			hash:     "#all, folks",
+			slashes:  false,
+			port:     3306,
+		},
+	}
+
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		vec.Reset()
+		if err := vec.ParseStr(tst.url); err != nil {
+			b.Fatal(err)
+		}
+
+		if vec.SchemeString() != tst.target.scheme {
+			printErr(b, &tst, "scheme mismatch", vec.SchemeString(), "vs", tst.target.scheme)
+		}
+		if tst.target.slashes && vec.Slashes() != tst.target.slashes {
+			printErr(b, &tst, "slashes mismatch", vec.Slashes(), "vs", tst.target.slashes)
+		}
+		if len(tst.target.auth) > 0 && vec.AuthString() != tst.target.auth {
+			printErr(b, &tst, "auth mismatch", vec.AuthString(), "vs", tst.target.auth)
+		}
+		if len(tst.target.username) > 0 && vec.UsernameString() != tst.target.username {
+			printErr(b, &tst, "username mismatch", vec.UsernameString(), "vs", tst.target.username)
+		}
+		if len(tst.target.password) > 0 && vec.PasswordString() != tst.target.password {
+			printErr(b, &tst, "password mismatch", vec.PasswordString(), "vs", tst.target.password)
+		}
+		if len(tst.target.host) > 0 && vec.HostString() != tst.target.host {
+			printErr(b, &tst, "host mismatch", vec.HostString(), "vs", tst.target.host)
+		}
+		if len(tst.target.hostname) > 0 && vec.HostnameString() != tst.target.hostname {
+			printErr(b, &tst, "hostname mismatch", vec.HostnameString(), "vs", tst.target.hostname)
+		}
+		if tst.target.port > 0 && vec.Port() != tst.target.port {
+			printErr(b, &tst, "port mismatch", vec.Port(), "vs", tst.target.port)
+		}
+		if len(tst.target.path) > 0 && vec.PathString() != tst.target.path {
+			printErr(b, &tst, "path mismatch", vec.PathString(), "vs", tst.target.path)
+		}
+		if len(tst.target.query) > 0 && vec.QueryString() != tst.target.query {
+			printErr(b, &tst, "query mismatch", vec.QueryString(), "vs", tst.target.query)
+		}
+		if len(tst.target.hash) > 0 && vec.HashString() != tst.target.hash {
+			printErr(b, &tst, "hash mismatch", vec.HashString(), "vs", tst.target.hash)
+		}
+	}
+}
+
+func printErr(t testing.TB, tst *testTargets, args ...interface{}) {
+	t.Error("\nsrc: "+tst.url+"\n", args)
 }
