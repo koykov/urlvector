@@ -7,7 +7,8 @@ import (
 
 type Vector struct {
 	vector.Vector
-	keyAddr uint64
+	keyAddr     uint64
+	queryParsed bool
 }
 
 func NewVector() *Vector {
@@ -69,7 +70,16 @@ func (vec *Vector) Path() *vector.Node {
 }
 
 func (vec *Vector) Query() *vector.Node {
-	return vec.Get("query")
+	query := vec.Get("query")
+	if !vec.queryParsed {
+		vec.queryParsed = true
+		vec.parseQueryParams(query)
+	}
+	return query
+}
+
+func (vec *Vector) queryOrigin() *vector.Node {
+	return vec.Get("queryorigin")
 }
 
 func (vec *Vector) Hash() *vector.Node {
@@ -79,4 +89,5 @@ func (vec *Vector) Hash() *vector.Node {
 func (vec *Vector) Reset() {
 	vec.Vector.Reset()
 	vec.keyAddr = 0
+	vec.queryParsed = false
 }

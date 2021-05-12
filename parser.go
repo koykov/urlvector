@@ -10,31 +10,33 @@ import (
 )
 
 const (
-	offsetScheme   = 0
-	offsetSlashes  = 6
-	offsetAuth     = 13
-	offsetUsername = 17
-	offsetPassword = 25
-	offsetHost     = 33
-	offsetHostname = 37
-	offsetPort     = 45
-	offsetPath     = 49
-	offsetQuery    = 57
-	offsetHash     = 62
-	offsetTrue     = 66
+	offsetScheme      = 0
+	offsetSlashes     = 6
+	offsetAuth        = 13
+	offsetUsername    = 17
+	offsetPassword    = 25
+	offsetHost        = 33
+	offsetHostname    = 37
+	offsetPort        = 45
+	offsetPath        = 49
+	offsetQueryOrigin = 57
+	offsetHash        = 68
+	offsetTrue        = 72
+	offsetQuery       = 76
 
-	lenScheme   = 6
-	lenSlashes  = 7
-	lenAuth     = 4
-	lenUsername = 8
-	lenPassword = 8
-	lenHost     = 4
-	lenHostname = 8
-	lenPort     = 4
-	lenPath     = 4
-	lenQuery    = 5
-	lenHash     = 4
-	lenTrue     = 4
+	lenScheme      = 6
+	lenSlashes     = 7
+	lenAuth        = 4
+	lenUsername    = 8
+	lenPassword    = 8
+	lenHost        = 4
+	lenHostname    = 8
+	lenPort        = 4
+	lenPath        = 4
+	lenQueryOrigin = 11
+	lenHash        = 4
+	lenTrue        = 4
+	lenQuery       = 5
 )
 
 var (
@@ -49,7 +51,7 @@ var (
 	bQM        = []byte("?")
 	bHash      = []byte("#")
 
-	bIndex = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryhashtrue")
+	bIndex = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")
 )
 
 func (vec *Vector) parse(s []byte, copy bool) (err error) {
@@ -246,8 +248,9 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
-	query, iq := vec.GetChildWT(node, depth, vector.TypeStr)
+	queryOrig, iqo := vec.GetChildWT(node, depth, vector.TypeStr)
 	hash, ih := vec.GetChildWT(node, depth, vector.TypeStr)
+	query, iq := vec.GetChildWT(node, depth, vector.TypeObj)
 
 	if offset < vec.SrcLen() {
 		posHash := bytealg.IndexAt(vec.Src(), bHash, offset)
@@ -258,14 +261,54 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 			hash.Value().Set(vec.SrcAddr()+uint64(posHash), vec.SrcLen()-posHash)
 		}
 		query.Key().Set(vec.keyAddr+offsetQuery, lenQuery)
-		query.Value().Set(vec.SrcAddr()+uint64(offset), posHash-offset)
+		queryOrig.Key().Set(vec.keyAddr+offsetQueryOrigin, lenQueryOrigin)
+		queryOrig.Value().Set(vec.SrcAddr()+uint64(offset), posHash-offset)
 		offset = vec.SrcLen()
 	}
 
-	vec.PutNode(iq, query)
+	vec.PutNode(iqo, queryOrig)
 	vec.PutNode(ih, hash)
+	vec.PutNode(iq, query)
 
 	return offset, err
+}
+
+func (vec *Vector) parseQueryParams(query *vector.Node) {
+	origin := vec.QueryBytes()
+	if len(origin) == 0 {
+		return
+	}
+	h := (*reflect.SliceHeader)(unsafe.Pointer(&origin))
+	originAddr := uint64(h.Data)
+	var (
+		node   *vector.Node
+		idx, i int
+		offset uint64
+		k      = true
+	)
+	node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
+	_ = origin[len(origin)-1]
+	for i = 0; i < len(origin); i++ {
+		switch origin[i] {
+		case '?':
+			offset = uint64(i) + 1
+		case '&':
+			k = true
+			node.Value().Set(originAddr+offset, i-int(offset))
+			offset = uint64(i) + 1
+			vec.PutNode(idx, node)
+
+			node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
+		case '=':
+			if k {
+				k = false
+				node.Key().Set(originAddr+offset, i-int(offset))
+				offset = uint64(i) + 1
+			}
+		}
+	}
+	node.Value().Set(originAddr+offset, i-int(offset))
+	vec.PutNode(idx, node)
 }
 
 func max(a, b int) int {

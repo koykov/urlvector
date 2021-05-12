@@ -57,11 +57,11 @@ func (vec *Vector) PathString() string {
 }
 
 func (vec *Vector) QueryBytes() []byte {
-	return vec.Query().Bytes()
+	return vec.queryOrigin().Bytes()
 }
 
 func (vec *Vector) QueryString() string {
-	return vec.Query().String()
+	return vec.queryOrigin().String()
 }
 
 func (vec *Vector) HashBytes() []byte {
