@@ -5,6 +5,21 @@ import (
 	"github.com/koykov/vector"
 )
 
+const (
+	idxScheme      = 1
+	idxSlashes     = 2
+	idxAuth        = 3
+	idxUsername    = 4
+	idxPassword    = 5
+	idxHost        = 6
+	idxHostname    = 7
+	idxPort        = 8
+	idxPath        = 9
+	idxQueryOrigin = 10
+	idxHash        = 11
+	idxQuery       = 12
+)
+
 type Vector struct {
 	vector.Vector
 	keyAddr     uint64
@@ -33,44 +48,44 @@ func (vec *Vector) ParseCopyStr(s string) error {
 }
 
 func (vec *Vector) Scheme() *vector.Node {
-	return vec.Get("scheme")
+	return vec.GetByIdx(idxScheme)
 }
 
 func (vec *Vector) Slashes() bool {
-	return vec.Get("slashes").Bool()
+	return vec.GetByIdx(idxSlashes).Bool()
 }
 
 func (vec *Vector) Auth() *vector.Node {
-	return vec.Get("auth")
+	return vec.GetByIdx(idxAuth)
 }
 
 func (vec *Vector) Username() *vector.Node {
-	return vec.Get("username")
+	return vec.GetByIdx(idxUsername)
 }
 
 func (vec *Vector) Password() *vector.Node {
-	return vec.Get("password")
+	return vec.GetByIdx(idxPassword)
 }
 
 func (vec *Vector) Host() *vector.Node {
-	return vec.Get("host")
+	return vec.GetByIdx(idxHost)
 }
 
 func (vec *Vector) Hostname() *vector.Node {
-	return vec.Get("hostname")
+	return vec.GetByIdx(idxHostname)
 }
 
 func (vec *Vector) Port() int {
-	i, _ := vec.Get("port").Int()
+	i, _ := vec.GetByIdx(idxPort).Int()
 	return int(i)
 }
 
 func (vec *Vector) Path() *vector.Node {
-	return vec.Get("path")
+	return vec.GetByIdx(idxPath)
 }
 
 func (vec *Vector) Query() *vector.Node {
-	query := vec.Get("query")
+	query := vec.GetByIdx(idxQuery)
 	if !vec.queryParsed {
 		vec.queryParsed = true
 		vec.parseQueryParams(query)
@@ -79,11 +94,11 @@ func (vec *Vector) Query() *vector.Node {
 }
 
 func (vec *Vector) queryOrigin() *vector.Node {
-	return vec.Get("queryorigin")
+	return vec.GetByIdx(idxQueryOrigin)
 }
 
 func (vec *Vector) Hash() *vector.Node {
-	return vec.Get("hash")
+	return vec.GetByIdx(idxHash)
 }
 
 func (vec *Vector) Reset() {
