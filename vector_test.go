@@ -263,6 +263,21 @@ func BenchmarkVector_Parse(b *testing.B) {
 	}
 }
 
+func BenchmarkVector_ParseQuery(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		vec.Reset()
+		_ = vec.ParseCopy(url1)
+		query := vec.Query()
+		query.Each(func(_ int, node *vector.Node) {
+			k := node.KeyString()
+			if url1target[k] != node.String() {
+				b.Error("url1 mismatch query param", k, "need", url1target[k], "got", node.String())
+			}
+		})
+	}
+}
+
 func printErr(t testing.TB, tst *testTargets, args ...interface{}) {
 	t.Error("\nsrc: "+tst.url+"\n", args)
 }
