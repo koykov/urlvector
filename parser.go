@@ -284,7 +284,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 		node   *vector.Node
 		idx, i int
 		offset uint64
-		k      = true
+		k, esc = true, false
 	)
 	node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
 	_ = origin[len(origin)-1]
@@ -295,6 +295,9 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 		case '&':
 			k = true
 			node.Value().Set(originAddr+offset, i-int(offset))
+			if esc {
+				node.Value().SetFlag(vector.FlagEscape, true)
+			}
 			offset = uint64(i) + 1
 			vec.PutNode(idx, node)
 
@@ -305,6 +308,9 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 				node.Key().Set(originAddr+offset, i-int(offset))
 				offset = uint64(i) + 1
 			}
+			esc = false
+		case '%':
+			esc = true
 		}
 	}
 	node.Value().Set(originAddr+offset, i-int(offset))
