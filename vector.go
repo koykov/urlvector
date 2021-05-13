@@ -28,6 +28,7 @@ type Vector struct {
 
 func NewVector() *Vector {
 	vec := &Vector{}
+	vec.Helper = urlHelper
 	return vec
 }
 

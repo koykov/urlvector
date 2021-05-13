@@ -119,7 +119,26 @@ var (
 		},
 	}
 	url0 = []byte("https://john_ruth:hangman17@99.99.99.99:3306/foo/bar?that\\'s#all, folks")
-	url1 = []byte("http://localhost:8011/get_data?v=default&blockID=319385&page=https%3A%2F%2Fultra-software-base.ru%2Fsystem%2Fgoogle-chrome.html%3Fyclid%3D212247430717539672&domain=ultra-software-base.ru&uid=4f5d0edc-3a3e-48d0-9872-0b48a7998ac6&clientNotice=true&imgX=360&imgY=240&limit=1&subage_dt=2021-01-29&format=json&cur=RUB&ua=Mozilla%2F5.0+%28Windows+NT+6.1%3B+Win64%3B+x64%29+AppleWebKit%2F537.36+%28KHTML%2C+like+Gecko%29+Ch rome%2F89.0.4389.105+YaBrowser%2F21.3.3.230+Yowser%2F2.5+Safari%2F537.36&ip=5.5.5.5&subage=102&language=ru")
+
+	url1       = []byte("http://localhost:8011/get_data?v=default&blockID=319385&page=https%3A%2F%2Fultra-software-base.ru%2Fsystem%2Fgoogle-chrome.html%3Fyclid%3D212247430717539672&domain=ultra-software-base.ru&uid=4f5d0edc-3a3e-48d0-9872-0b48a7998ac6&clientNotice=true&imgX=360&imgY=240&limit=1&subage_dt=2021-01-29&format=json&cur=RUB&ua=Mozilla%2F5.0+%28Windows+NT+6.1%3B+Win64%3B+x64%29+AppleWebKit%2F537.36+%28KHTML%2C+like+Gecko%29+Chrome%2F89.0.4389.105+YaBrowser%2F21.3.3.230+Yowser%2F2.5+Safari%2F537.36&ip=5.5.5.5&subage=102&language=ru")
+	url1target = map[string]string{
+		"v":            "default",
+		"blockID":      "319385",
+		"page":         "https://ultra-software-base.ru/system/google-chrome.html?yclid=212247430717539672",
+		"domain":       "ultra-software-base.ru",
+		"uid":          "4f5d0edc-3a3e-48d0-9872-0b48a7998ac6",
+		"clientNotice": "true",
+		"imgX":         "360",
+		"imgY":         "240",
+		"limit":        "1",
+		"subage_dt":    "2021-01-29",
+		"format":       "json",
+		"cur":          "RUB",
+		"ua":           "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.105 YaBrowser/21.3.3.230 Yowser/2.5 Safari/537.36",
+		"ip":           "5.5.5.5",
+		"subage":       "102",
+		"language":     "ru",
+	}
 
 	vec = NewVector()
 )
@@ -176,7 +195,10 @@ func TestVector_ParseQuery(t *testing.T) {
 	_ = vec.Parse(url1)
 	query := vec.Query()
 	query.Each(func(_ int, node *vector.Node) {
-		t.Log(node.KeyString(), " = ", node.String())
+		k := node.KeyString()
+		if url1target[k] != node.String() {
+			t.Error("url1 mismatch query param", k, "need", url1target[k], "got", node.String())
+		}
 	})
 }
 
