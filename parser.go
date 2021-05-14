@@ -50,6 +50,7 @@ var (
 	bAt        = []byte("@")
 	bQM        = []byte("?")
 	bHash      = []byte("#")
+	bQB        = []byte("[]")
 
 	bIndex = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")
 )
