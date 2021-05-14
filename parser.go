@@ -294,9 +294,15 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			offset = uint64(i) + 1
 		case '&':
 			k = true
-			node.Value().Set(originAddr+offset, i-int(offset))
-			if esc {
-				node.Value().SetFlag(vector.FlagEscape, true)
+			if node.Key().Limit() > 0 {
+				// Regular case: exists both key and value.
+				node.Value().Set(originAddr+offset, i-int(offset))
+				if esc {
+					node.Value().SetFlag(vector.FlagEscape, true)
+				}
+			} else {
+				// Specific case: exists only key without value.
+				node.Key().Set(originAddr+offset, i-int(offset))
 			}
 			offset = uint64(i) + 1
 			vec.PutNode(idx, node)
@@ -313,7 +319,13 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			esc = true
 		}
 	}
-	node.Value().Set(originAddr+offset, i-int(offset))
+	if node.Key().Limit() > 0 {
+		// Exists key and value.
+		node.Value().Set(originAddr+offset, i-int(offset))
+	} else {
+		// Exists only key.
+		node.Key().Set(originAddr+offset, i-int(offset))
+	}
 	vec.PutNode(idx, node)
 }
 
