@@ -218,7 +218,7 @@ func TestVector_ParseQuery(t *testing.T) {
 	_ = vec.Parse(query2)
 	query := vec.Query()
 	query.Each(func(_ int, node *vector.Node) {
-		t.Log(node.KeyString(), "=", node.String())
+		t.Log(node.KeyString(), "=", node.String(), node.Type())
 	})
 }
 

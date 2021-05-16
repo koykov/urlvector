@@ -282,10 +282,10 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	h := (*reflect.SliceHeader)(unsafe.Pointer(&origin))
 	originAddr := uint64(h.Data)
 	var (
-		node   *vector.Node
-		idx, i int
-		offset uint64
-		k, esc = true, false
+		node      *vector.Node
+		idx, i    int
+		offset    uint64
+		k, a, esc = true, false, false
 	)
 	node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
 	_ = origin[len(origin)-1]
@@ -313,6 +313,9 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			if k {
 				k = false
 				node.Key().Set(originAddr+offset, i-int(offset))
+				if kl := node.Key().Limit(); kl > 2 && bytes.Equal(node.KeyBytes()[kl-2:], bQB) {
+					a = true
+				}
 				offset = uint64(i) + 1
 			}
 			esc = false
@@ -328,6 +331,10 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 		node.Key().Set(originAddr+offset, i-int(offset))
 	}
 	vec.PutNode(idx, node)
+
+	if a {
+		// todo rebalance nodes
+	}
 }
 
 func max(a, b int) int {
