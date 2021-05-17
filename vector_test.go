@@ -141,7 +141,7 @@ var (
 	}
 
 	query1 = []byte("http://x.com/1?x&y=1&z")
-	query2 = []byte("http://x.com/x/y/z?arr[]=1&arr[]=2&arr[]=3&b=x")
+	query2 = []byte("http://x.com/x/y/z?arr[]=1&arr[]=2&arr[]=3&b=x&arr1[]=a&arr1[]=b&arr1[]=c")
 
 	vec = NewVector()
 )

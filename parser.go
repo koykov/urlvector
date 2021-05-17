@@ -374,6 +374,7 @@ func (vec *Vector) parseQueryParams1(query *vector.Node) {
 		if kl := len(k); kl > 2 && bytes.Equal(k[kl-2:], bQB) {
 			if root = query.Get(fastconv.B2S(k)); root.Type() != vector.TypeArr {
 				root, _ = vec.GetChildWT(query, 2, vector.TypeArr)
+				root.SetOffset(vec.Index.Len(3))
 				root.Key().Set(originAddr+uint64(offset), len(k))
 			}
 			node, idx = vec.GetChildWT(root, 3, vector.TypeStr)
