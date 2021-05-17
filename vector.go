@@ -89,8 +89,7 @@ func (vec *Vector) Query() *vector.Node {
 	query := vec.GetByIdx(idxQuery)
 	if !vec.queryParsed {
 		vec.queryParsed = true
-		// vec.parseQueryParams(query)
-		vec.parseQueryParams1(query)
+		vec.parseQueryParams(query)
 	}
 	return query
 }

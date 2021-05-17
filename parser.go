@@ -276,69 +276,6 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 }
 
 func (vec *Vector) parseQueryParams(query *vector.Node) {
-	origin := vec.QueryBytes()
-	if len(origin) == 0 {
-		return
-	}
-	h := (*reflect.SliceHeader)(unsafe.Pointer(&origin))
-	originAddr := uint64(h.Data)
-	var (
-		node      *vector.Node
-		idx, i    int
-		offset    uint64
-		k, a, esc = true, false, false
-	)
-	node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
-	_ = origin[len(origin)-1]
-	for i = 0; i < len(origin); i++ {
-		switch origin[i] {
-		case '?':
-			offset = uint64(i) + 1
-		case '&':
-			k = true
-			if node.Key().Limit() > 0 {
-				// Regular case: exists both key and value.
-				node.Value().Set(originAddr+offset, i-int(offset))
-				if esc {
-					node.Value().SetFlag(vector.FlagEscape, true)
-				}
-			} else {
-				// Specific case: exists only key without value.
-				node.Key().Set(originAddr+offset, i-int(offset))
-			}
-			offset = uint64(i) + 1
-			vec.PutNode(idx, node)
-
-			node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
-		case '=':
-			if k {
-				k = false
-				node.Key().Set(originAddr+offset, i-int(offset))
-				if kl := node.Key().Limit(); kl > 2 && bytes.Equal(node.KeyBytes()[kl-2:], bQB) {
-					a = true
-				}
-				offset = uint64(i) + 1
-			}
-			esc = false
-		case '%':
-			esc = true
-		}
-	}
-	if node.Key().Limit() > 0 {
-		// Exists key and value.
-		node.Value().Set(originAddr+offset, i-int(offset))
-	} else {
-		// Exists only key.
-		node.Key().Set(originAddr+offset, i-int(offset))
-	}
-	vec.PutNode(idx, node)
-
-	if a {
-		// todo rebalance nodes
-	}
-}
-
-func (vec *Vector) parseQueryParams1(query *vector.Node) {
 	origin := bytealg.TrimLeft(vec.QueryBytes(), bQM)
 	if len(origin) == 0 {
 		return
