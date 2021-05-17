@@ -337,6 +337,53 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	}
 }
 
+func (vec *Vector) parseQueryParams1(query *vector.Node) {
+	origin := bytealg.TrimLeft(vec.QueryBytes(), bQM)
+	if len(origin) == 0 {
+		return
+	}
+	h := (*reflect.SliceHeader)(unsafe.Pointer(&origin))
+	originAddr := uint64(h.Data)
+	var (
+		offset   int
+		kv, k, v []byte
+	)
+	for {
+		kv, k, v = nil, nil, nil
+
+		i := bytealg.IndexByteAtRL(origin, '&', offset)
+		if i < 0 {
+			i = len(origin)
+		}
+		kv = origin[offset:i]
+		j := bytealg.IndexByteAtRL(kv, '=', 0)
+		if j < 0 {
+			k = kv
+		} else {
+			k = kv[:j]
+			if j < len(kv)-1 {
+				v = kv[j+1:]
+			}
+		}
+		if len(k) == 0 {
+			continue
+		}
+
+		node, idx := vec.GetChildWT(query, 2, vector.TypeStr)
+		node.Key().Set(originAddr+uint64(offset), len(k))
+		if len(v) > 0 {
+			node.Value().Set(originAddr+uint64(offset+len(k))+1, len(v))
+			node.Value().SetFlag(vector.FlagEscape, bytealg.IndexByteAtRL(v, '%', 0) >= 0)
+		}
+		vec.PutNode(idx, node)
+
+		offset = i + 1
+		if offset >= len(origin) {
+			break
+		}
+	}
+}
+
 func max(a, b int) int {
 	if a > b {
 		return a

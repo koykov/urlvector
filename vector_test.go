@@ -194,29 +194,31 @@ func TestVector_Parse(t *testing.T) {
 }
 
 func TestVector_ParseQuery(t *testing.T) {
-	// vec.Reset()
-	// _ = vec.Parse(query0)
-	// query := vec.Query()
-	// query.Each(func(_ int, node *vector.Node) {
-	// 	k := node.KeyString()
-	// 	if query0target[k] != node.String() {
-	// 		t.Error("query0 mismatch query param", k, "need", query0target[k], "got", node.String())
-	// 	}
-	// })
-	//
-	// vec.Reset()
-	// _ = vec.Parse(query1)
-	// query = vec.Query()
-	// if !query.Exists("x") || query.Get("x").String() != "" {
-	// 	t.Error("query1 mismatch query param x")
-	// }
-	// if !query.Exists("z") || query.Get("z").String() != "" {
-	// 	t.Error("query1 mismatch query param z")
-	// }
+	var query *vector.Node
+
+	vec.Reset()
+	_ = vec.Parse(query0)
+	query = vec.Query()
+	query.Each(func(_ int, node *vector.Node) {
+		k := node.KeyString()
+		if query0target[k] != node.String() {
+			t.Error("query0 mismatch query param", k, "need", query0target[k], "got", node.String())
+		}
+	})
+
+	vec.Reset()
+	_ = vec.Parse(query1)
+	query = vec.Query()
+	if !query.Exists("x") || query.Get("x").String() != "" {
+		t.Error("query1 mismatch query param x")
+	}
+	if !query.Exists("z") || query.Get("z").String() != "" {
+		t.Error("query1 mismatch query param z")
+	}
 
 	vec.Reset()
 	_ = vec.Parse(query2)
-	query := vec.Query()
+	query = vec.Query()
 	query.Each(func(_ int, node *vector.Node) {
 		t.Log(node.KeyString(), "=", node.String(), node.Type())
 	})
