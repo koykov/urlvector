@@ -6,6 +6,7 @@ import (
 	"unsafe"
 
 	"github.com/koykov/bytealg"
+	"github.com/koykov/fastconv"
 	"github.com/koykov/vector"
 )
 
@@ -345,8 +346,9 @@ func (vec *Vector) parseQueryParams1(query *vector.Node) {
 	h := (*reflect.SliceHeader)(unsafe.Pointer(&origin))
 	originAddr := uint64(h.Data)
 	var (
-		offset   int
-		kv, k, v []byte
+		offset, idx int
+		kv, k, v    []byte
+		root, node  *vector.Node
 	)
 	for {
 		kv, k, v = nil, nil, nil
@@ -369,13 +371,27 @@ func (vec *Vector) parseQueryParams1(query *vector.Node) {
 			continue
 		}
 
-		node, idx := vec.GetChildWT(query, 2, vector.TypeStr)
-		node.Key().Set(originAddr+uint64(offset), len(k))
-		if len(v) > 0 {
-			node.Value().Set(originAddr+uint64(offset+len(k))+1, len(v))
-			node.Value().SetFlag(vector.FlagEscape, bytealg.IndexByteAtRL(v, '%', 0) >= 0)
+		if kl := len(k); kl > 2 && bytes.Equal(k[kl-2:], bQB) {
+			if root = query.Get(fastconv.B2S(k)); root.Type() != vector.TypeArr {
+				root, _ = vec.GetChildWT(query, 2, vector.TypeArr)
+				root.Key().Set(originAddr+uint64(offset), len(k))
+			}
+			node, idx = vec.GetChildWT(root, 3, vector.TypeStr)
+			if len(v) > 0 {
+				node.Value().Set(originAddr+uint64(offset+len(k))+1, len(v))
+				node.Value().SetFlag(vector.FlagEscape, bytealg.IndexByteAtRL(v, '%', 0) >= 0)
+			}
+			vec.PutNode(idx, node)
+			vec.PutNode(root.Index(), root)
+		} else {
+			node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
+			node.Key().Set(originAddr+uint64(offset), len(k))
+			if len(v) > 0 {
+				node.Value().Set(originAddr+uint64(offset+len(k))+1, len(v))
+				node.Value().SetFlag(vector.FlagEscape, bytealg.IndexByteAtRL(v, '%', 0) >= 0)
+			}
+			vec.PutNode(idx, node)
 		}
-		vec.PutNode(idx, node)
 
 		offset = i + 1
 		if offset >= len(origin) {

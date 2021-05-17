@@ -221,6 +221,11 @@ func TestVector_ParseQuery(t *testing.T) {
 	query = vec.Query()
 	query.Each(func(_ int, node *vector.Node) {
 		t.Log(node.KeyString(), "=", node.String(), node.Type())
+		if node.Type() == vector.TypeArr {
+			node.Each(func(_ int, cnode *vector.Node) {
+				t.Log(">", cnode.KeyString(), "=", cnode.String(), cnode.Type())
+			})
+		}
 	})
 }
 
