@@ -146,6 +146,10 @@ var (
 	vec = NewVector()
 )
 
+func printErr(t testing.TB, tst *testTargets, args ...interface{}) {
+	t.Error("\nsrc: "+tst.url+"\n", args)
+}
+
 func TestVector_Parse(t *testing.T) {
 	for i, tst := range cases {
 		vec.Reset()
@@ -220,11 +224,25 @@ func TestVector_ParseQuery(t *testing.T) {
 	_ = vec.Parse(query2)
 	query = vec.Query()
 	query.Each(func(_ int, node *vector.Node) {
-		t.Log(node.KeyString(), "=", node.String(), node.Type())
-		if node.Type() == vector.TypeArr {
-			node.Each(func(_ int, cnode *vector.Node) {
-				t.Log(">", cnode.KeyString(), "=", cnode.String(), cnode.Type())
-			})
+		switch {
+		case node.KeyString() == "b":
+			if node.String() != "x" {
+				t.Error("query 2 mismatch query param", node.KeyString(), "need", "x", "got", node.String())
+			}
+		case node.KeyString() == "arr[]":
+			if node.Limit() != 3 {
+				t.Error("query 2 unexpected length of param arr[]", "need", 3, "got", node.Limit())
+			}
+			if node.At(1).String() != "2" {
+				t.Error("query 2 mismatch query param arr[1]", "need", "2", "got", node.At(1).String())
+			}
+		case node.KeyString() == "arr1[]":
+			if node.Limit() != 3 {
+				t.Error("query 2 unexpected length of param arr1[]", "need", 3, "got", node.Limit())
+			}
+			if node.At(0).String() != "a" {
+				t.Error("query 2 mismatch query param arr1[0]", "need", "a", "got", node.At(0).String())
+			}
 		}
 	})
 }
@@ -290,7 +308,7 @@ func BenchmarkVector_Parse(b *testing.B) {
 	}
 }
 
-func BenchmarkVector_ParseQuery(b *testing.B) {
+func BenchmarkVector_ParseQuery0(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		vec.Reset()
@@ -305,6 +323,48 @@ func BenchmarkVector_ParseQuery(b *testing.B) {
 	}
 }
 
-func printErr(t testing.TB, tst *testTargets, args ...interface{}) {
-	t.Error("\nsrc: "+tst.url+"\n", args)
+func BenchmarkVector_ParseQuery1(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		vec.Reset()
+		_ = vec.ParseCopy(query1)
+		query := vec.Query()
+		if !query.Exists("x") || query.Get("x").String() != "" {
+			b.Error("query1 mismatch query param x")
+		}
+		if !query.Exists("z") || query.Get("z").String() != "" {
+			b.Error("query1 mismatch query param z")
+		}
+	}
+}
+
+func BenchmarkVector_ParseQuery2(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		vec.Reset()
+		_ = vec.ParseCopy(query2)
+		query := vec.Query()
+		query.Each(func(_ int, node *vector.Node) {
+			switch {
+			case node.KeyString() == "b":
+				if node.String() != "x" {
+					b.Error("query 2 mismatch query param", node.KeyString(), "need", "x", "got", node.String())
+				}
+			case node.KeyString() == "arr[]":
+				if node.Limit() != 3 {
+					b.Error("query 2 unexpected length of param arr[]", "need", 3, "got", node.Limit())
+				}
+				if node.At(1).String() != "2" {
+					b.Error("query 2 mismatch query param arr[1]", "need", "2", "got", node.At(1).String())
+				}
+			case node.KeyString() == "arr1[]":
+				if node.Limit() != 3 {
+					b.Error("query 2 unexpected length of param arr1[]", "need", 3, "got", node.Limit())
+				}
+				if node.At(0).String() != "a" {
+					b.Error("query 2 mismatch query param arr1[0]", "need", "a", "got", node.At(0).String())
+				}
+			}
+		})
+	}
 }
