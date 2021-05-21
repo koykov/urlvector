@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	// Offset of keys substrings in bKeys.
 	offsetScheme      = 0
 	offsetSlashes     = 6
 	offsetAuth        = 13
@@ -25,6 +26,7 @@ const (
 	offsetTrue        = 72
 	offsetQuery       = 76
 
+	// Length of keys substrings in bKeys.
 	lenScheme      = 6
 	lenSlashes     = 7
 	lenAuth        = 4
@@ -38,9 +40,13 @@ const (
 	lenHash        = 4
 	lenTrue        = 4
 	lenQuery       = 5
+
+	// Max scheme length by https://en.wikipedia.org/wiki/List_of_URI_schemes#Official_IANA-registered_schemes.
+	maxSchemaLen = 29
 )
 
 var (
+	// Byte constants.
 	bSpace     = []byte(" ")
 	bBlob      = []byte("blob:")
 	bSchemaSep = []byte("://")
@@ -53,12 +59,15 @@ var (
 	bHash      = []byte("#")
 	bQB        = []byte("[]")
 
+	// Keys source array and raw address of it.
 	bKeys    = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")
 	keysAddr uint64
 )
 
+// Main internal parser helper.
 func (vec *Vector) parse(s []byte, copy bool) (err error) {
 	s = bytealg.Trim(s, bSpace)
+	// Remove blob: prefix if present.
 	if len(s) >= 5 && bytes.Equal(s[:5], bBlob) {
 		s = s[5:]
 	}
@@ -71,6 +80,7 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 	root, i := vec.GetNodeWT(0, vector.TypeObj)
 	root.SetOffset(vec.Index.Len(1))
 
+	// Parse URL parts.
 	if offset, err = vec.parseScheme(1, offset, root); err != nil {
 		vec.SetErrOffset(offset)
 		return
@@ -92,6 +102,7 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 		return
 	}
 
+	// Return root node back to the vector.
 	vec.PutNode(i, root)
 
 	// Check unparsed tail.
@@ -104,14 +115,14 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 	return
 }
 
+// Parse schema and slashes parts.
 func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
 	scheme, isc := vec.GetChildWT(node, depth, vector.TypeStr)
 	slashes, isl := vec.GetChildWT(node, depth, vector.TypeBool)
 
-	// max scheme length by https://en.wikipedia.org/wiki/List_of_URI_schemes#Official_IANA-registered_schemes
-	limit := 29
+	limit := maxSchemaLen
 	if sl := vec.SrcLen(); sl < limit {
 		limit = sl
 	}
@@ -134,6 +145,7 @@ func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error
 	return offset, err
 }
 
+// Parse auth (username + password) and separate username and password parts.
 func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
@@ -172,6 +184,7 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 	return offset, err
 }
 
+// Parse host (hostname + port) and separate hostname and port parts.
 func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
@@ -220,6 +233,7 @@ loop:
 	return offset, err
 }
 
+// Parse path part.
 func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
@@ -245,6 +259,10 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 	return offset, err
 }
 
+// Parse query part.
+//
+// Note that this method doesn't parse query to separate args for performance.
+// Query will be parsed to separate args by first attempt to access to any query argument.
 func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
@@ -273,6 +291,7 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 	return offset, err
 }
 
+// Parse query string to separate arguments.
 func (vec *Vector) parseQueryParams(query *vector.Node) {
 	origin := bytealg.TrimLeft(vec.QueryBytes(), bQM)
 	if len(origin) == 0 {
