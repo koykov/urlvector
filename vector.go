@@ -22,7 +22,6 @@ const (
 
 type Vector struct {
 	vector.Vector
-	keyAddr     uint64
 	queryParsed bool
 }
 
@@ -104,6 +103,5 @@ func (vec *Vector) Hash() *vector.Node {
 
 func (vec *Vector) Reset() {
 	vec.Vector.Reset()
-	vec.keyAddr = 0
 	vec.queryParsed = false
 }

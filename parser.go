@@ -53,7 +53,8 @@ var (
 	bHash      = []byte("#")
 	bQB        = []byte("[]")
 
-	bIndex = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")
+	bKeys    = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")
+	keysAddr uint64
 )
 
 func (vec *Vector) parse(s []byte, copy bool) (err error) {
@@ -64,9 +65,6 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 	if err = vec.SetSrc(s, copy); err != nil {
 		return
 	}
-
-	h := (*reflect.SliceHeader)(unsafe.Pointer(&bIndex))
-	vec.keyAddr = uint64(h.Data)
 
 	offset := 0
 	// Create root node and register it.
@@ -121,12 +119,12 @@ func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error
 		return offset, vector.ErrShortSrc
 	}
 	if pos := bytes.Index(vec.Src(), bSchemaSep); pos > 0 {
-		scheme.Key().Set(vec.keyAddr+offsetScheme, lenScheme)
+		scheme.Key().Set(keysAddr+offsetScheme, lenScheme)
 		scheme.Value().Set(vec.SrcAddr()+uint64(offset), pos)
 		offset += pos + 3
 	} else if bytes.Equal(vec.Src()[:2], bSlashes) {
-		slashes.Key().Set(vec.keyAddr+offsetSlashes, lenSlashes)
-		slashes.Value().Set(vec.keyAddr+offsetTrue, lenTrue)
+		slashes.Key().Set(keysAddr+offsetSlashes, lenSlashes)
+		slashes.Value().Set(keysAddr+offsetTrue, lenTrue)
 		offset += 2
 	}
 
@@ -150,18 +148,18 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 	}
 
 	if posAt > 0 {
-		auth.Key().Set(vec.keyAddr+offsetAuth, lenAuth)
+		auth.Key().Set(keysAddr+offsetAuth, lenAuth)
 		auth.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
 
 		if posCol >= 0 {
-			username.Key().Set(vec.keyAddr+offsetUsername, lenUsername)
+			username.Key().Set(keysAddr+offsetUsername, lenUsername)
 			username.Value().Set(vec.SrcAddr()+uint64(offset), posCol-offset)
 			offset = posCol + 1
 
-			password.Key().Set(vec.keyAddr+offsetPassword, lenPassword)
+			password.Key().Set(keysAddr+offsetPassword, lenPassword)
 			password.Value().Set(vec.SrcAddr()+uint64(offset), posAt-posCol-1)
 		} else {
-			username.Key().Set(vec.keyAddr+offsetUsername, lenUsername)
+			username.Key().Set(keysAddr+offsetUsername, lenUsername)
 			username.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
 		}
 		offset = posAt + 1
@@ -198,18 +196,18 @@ loop:
 		goto loop
 	}
 
-	host.Key().Set(vec.keyAddr+offsetHost, lenHost)
+	host.Key().Set(keysAddr+offsetHost, lenHost)
 	host.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
 
 	if posCol >= 0 {
-		hostname.Key().Set(vec.keyAddr+offsetHostname, lenHostname)
+		hostname.Key().Set(keysAddr+offsetHostname, lenHostname)
 		hostname.Value().Set(vec.SrcAddr()+uint64(offset), posCol-offset)
 		offset = posCol + 1
 
-		port.Key().Set(vec.keyAddr+offsetPort, lenPort)
+		port.Key().Set(keysAddr+offsetPort, lenPort)
 		port.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
 	} else {
-		hostname.Key().Set(vec.keyAddr+offsetHostname, lenHostname)
+		hostname.Key().Set(keysAddr+offsetHostname, lenHostname)
 		hostname.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
 	}
 
@@ -237,7 +235,7 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 				posQM = vec.SrcLen()
 			}
 		}
-		path.Key().Set(vec.keyAddr+offsetPath, lenPath)
+		path.Key().Set(keysAddr+offsetPath, lenPath)
 		path.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
 		offset = posQM
 	}
@@ -259,11 +257,11 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 		if posHash < 0 {
 			posHash = vec.SrcLen()
 		} else {
-			hash.Key().Set(vec.keyAddr+offsetHash, lenHash)
+			hash.Key().Set(keysAddr+offsetHash, lenHash)
 			hash.Value().Set(vec.SrcAddr()+uint64(posHash), vec.SrcLen()-posHash)
 		}
-		query.Key().Set(vec.keyAddr+offsetQuery, lenQuery)
-		queryOrig.Key().Set(vec.keyAddr+offsetQueryOrigin, lenQueryOrigin)
+		query.Key().Set(keysAddr+offsetQuery, lenQuery)
+		queryOrig.Key().Set(keysAddr+offsetQueryOrigin, lenQueryOrigin)
 		queryOrig.Value().Set(vec.SrcAddr()+uint64(offset), posHash-offset)
 		offset = vec.SrcLen()
 	}
