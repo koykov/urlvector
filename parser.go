@@ -353,6 +353,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			break
 		}
 	}
+	vec.PutNode(query.Index(), query)
 }
 
 func max(a, b int) int {
