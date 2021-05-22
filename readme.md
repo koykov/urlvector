@@ -9,7 +9,7 @@ It just stores an array with indexes of each part of the url (schema, hostname, 
 ## Usage
 
 ```go
-	src := "http://x.com/x/y/z?arr[]=1&arr[]=2&arr[]=3&b=x&arr1[]=a&arr1[]=b&arr1[]=c"
+src := "http://x.com/x/y/z?arr[]=1&arr[]=2&arr[]=3&b=x&arr1[]=a&arr1[]=b&arr1[]=c"
 vec := urlvector.Acquire()
 defer urlvector.Release(vec)
 _ = vec.ParseStr(src)
