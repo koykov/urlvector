@@ -2,8 +2,6 @@ package urlvector
 
 import (
 	"bytes"
-	"reflect"
-	"unsafe"
 
 	"github.com/koykov/bytealg"
 	"github.com/koykov/fastconv"
@@ -60,8 +58,7 @@ var (
 	bQB        = []byte("[]")
 
 	// Keys source array and raw address of it.
-	bKeys    = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")
-	keysAddr uint64
+	bKeys = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")
 )
 
 // Main internal parser helper.
@@ -130,12 +127,12 @@ func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error
 		return offset, vector.ErrShortSrc
 	}
 	if pos := bytes.Index(vec.Src(), bSchemaSep); pos > 0 {
-		scheme.Key().Set(keysAddr+offsetScheme, lenScheme)
-		scheme.Value().Set(vec.SrcAddr()+uint64(offset), pos)
+		scheme.Key().Init(bKeys, offsetScheme, lenScheme)
+		scheme.Value().Init(vec.Src(), offset, pos)
 		offset += pos + 3
 	} else if bytes.Equal(vec.Src()[:2], bSlashes) {
-		slashes.Key().Set(keysAddr+offsetSlashes, lenSlashes)
-		slashes.Value().Set(keysAddr+offsetTrue, lenTrue)
+		slashes.Key().Init(bKeys, offsetSlashes, lenSlashes)
+		slashes.Value().Init(bKeys, offsetTrue, lenTrue)
 		offset += 2
 	}
 
@@ -160,19 +157,19 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 	}
 
 	if posAt > 0 {
-		auth.Key().Set(keysAddr+offsetAuth, lenAuth)
-		auth.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
+		auth.Key().Init(bKeys, offsetAuth, lenAuth)
+		auth.Value().Init(vec.Src(), offset, posAt-offset)
 
 		if posCol >= 0 {
-			username.Key().Set(keysAddr+offsetUsername, lenUsername)
-			username.Value().Set(vec.SrcAddr()+uint64(offset), posCol-offset)
+			username.Key().Init(bKeys, offsetUsername, lenUsername)
+			username.Value().Init(vec.Src(), offset, posCol-offset)
 			offset = posCol + 1
 
-			password.Key().Set(keysAddr+offsetPassword, lenPassword)
-			password.Value().Set(vec.SrcAddr()+uint64(offset), posAt-posCol-1)
+			password.Key().Init(bKeys, offsetPassword, lenPassword)
+			password.Value().Init(vec.Src(), offset, posAt-posCol-1)
 		} else {
-			username.Key().Set(keysAddr+offsetUsername, lenUsername)
-			username.Value().Set(vec.SrcAddr()+uint64(offset), posAt-offset)
+			username.Key().Init(bKeys, offsetUsername, lenUsername)
+			username.Value().Init(vec.Src(), offset, posAt-offset)
 		}
 		offset = posAt + 1
 	}
@@ -209,19 +206,19 @@ loop:
 		goto loop
 	}
 
-	host.Key().Set(keysAddr+offsetHost, lenHost)
-	host.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
+	host.Key().Init(bKeys, offsetHost, lenHost)
+	host.Value().Init(vec.Src(), offset, posSl-offset)
 
 	if posCol >= 0 {
-		hostname.Key().Set(keysAddr+offsetHostname, lenHostname)
-		hostname.Value().Set(vec.SrcAddr()+uint64(offset), posCol-offset)
+		hostname.Key().Init(bKeys, offsetHostname, lenHostname)
+		hostname.Value().Init(vec.Src(), offset, posCol-offset)
 		offset = posCol + 1
 
-		port.Key().Set(keysAddr+offsetPort, lenPort)
-		port.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
+		port.Key().Init(bKeys, offsetPort, lenPort)
+		port.Value().Init(vec.Src(), offset, posSl-offset)
 	} else {
-		hostname.Key().Set(keysAddr+offsetHostname, lenHostname)
-		hostname.Value().Set(vec.SrcAddr()+uint64(offset), posSl-offset)
+		hostname.Key().Init(bKeys, offsetHostname, lenHostname)
+		hostname.Value().Init(vec.Src(), offset, posSl-offset)
 	}
 
 	vec.PutNode(ih, host)
@@ -249,8 +246,8 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 				posQM = vec.SrcLen()
 			}
 		}
-		path.Key().Set(keysAddr+offsetPath, lenPath)
-		path.Value().Set(vec.SrcAddr()+uint64(offset), posQM-offset)
+		path.Key().Init(bKeys, offsetPath, lenPath)
+		path.Value().Init(vec.Src(), offset, posQM-offset)
 		offset = posQM
 	}
 
@@ -275,12 +272,12 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 		if posHash < 0 {
 			posHash = vec.SrcLen()
 		} else {
-			hash.Key().Set(keysAddr+offsetHash, lenHash)
-			hash.Value().Set(vec.SrcAddr()+uint64(posHash), vec.SrcLen()-posHash)
+			hash.Key().Init(bKeys, offsetHash, lenHash)
+			hash.Value().Init(vec.Src(), posHash, vec.SrcLen()-posHash)
 		}
-		query.Key().Set(keysAddr+offsetQuery, lenQuery)
-		queryOrig.Key().Set(keysAddr+offsetQueryOrigin, lenQueryOrigin)
-		queryOrig.Value().Set(vec.SrcAddr()+uint64(offset), posHash-offset)
+		query.Key().Init(bKeys, offsetQuery, lenQuery)
+		queryOrig.Key().Init(bKeys, offsetQueryOrigin, lenQueryOrigin)
+		queryOrig.Value().Init(vec.Src(), offset, posHash-offset)
 		offset = vec.SrcLen()
 	}
 
@@ -297,8 +294,6 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	if len(origin) == 0 {
 		return
 	}
-	h := (*reflect.SliceHeader)(unsafe.Pointer(&origin))
-	originAddr := uint64(h.Data)
 	var (
 		offset, idx int
 		kv, k, v    []byte
@@ -329,20 +324,20 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			if root = query.Get(fastconv.B2S(k)); root.Type() != vector.TypeArr {
 				root, _ = vec.GetChildWT(query, 2, vector.TypeArr)
 				root.SetOffset(vec.Index.Len(3))
-				root.Key().Set(originAddr+uint64(offset), len(k))
+				root.Key().Init(origin, offset, len(k))
 			}
 			node, idx = vec.GetChildWT(root, 3, vector.TypeStr)
 			if len(v) > 0 {
-				node.Value().Set(originAddr+uint64(offset+len(k))+1, len(v))
+				node.Value().Init(origin, offset+len(k)+1, len(v))
 				node.Value().SetFlag(vector.FlagEscape, bytealg.IndexByteAtRL(v, '%', 0) >= 0)
 			}
 			vec.PutNode(idx, node)
 			vec.PutNode(root.Index(), root)
 		} else {
 			node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
-			node.Key().Set(originAddr+uint64(offset), len(k))
+			node.Key().Init(origin, offset, len(k))
 			if len(v) > 0 {
-				node.Value().Set(originAddr+uint64(offset+len(k))+1, len(v))
+				node.Value().Init(origin, offset+len(k)+1, len(v))
 				node.Value().SetFlag(vector.FlagEscape, bytealg.IndexByteAtRL(v, '%', 0) >= 0)
 			}
 			vec.PutNode(idx, node)
