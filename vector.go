@@ -120,8 +120,3 @@ func (vec *Vector) queryOrigin() *vector.Node {
 func (vec *Vector) Hash() *vector.Node {
 	return vec.GetByIdx(idxHash)
 }
-
-// Reset the vector.
-func (vec *Vector) Reset() {
-	vec.Vector.Reset()
-}
