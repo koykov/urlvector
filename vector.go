@@ -19,13 +19,13 @@ const (
 	idxQueryOrigin = 10
 	idxHash        = 11
 	idxQuery       = 12
+
+	flagQueryParsed = uint8(1)
 )
 
 // Parser object.
 type Vector struct {
 	vector.Vector
-	// Flag that indicates if query is already parsed.
-	queryParsed bool
 }
 
 // Make new parser.
@@ -104,8 +104,8 @@ func (vec *Vector) Path() *vector.Node {
 // Get query node.
 func (vec *Vector) Query() *vector.Node {
 	query := vec.GetByIdx(idxQuery)
-	if !vec.queryParsed {
-		vec.queryParsed = true
+	if !vec.CheckFlag(flagQueryParsed) {
+		vec.SetFlag(flagQueryParsed, true)
 		vec.parseQueryParams(query)
 	}
 	return query
@@ -124,5 +124,4 @@ func (vec *Vector) Hash() *vector.Node {
 // Reset the vector.
 func (vec *Vector) Reset() {
 	vec.Vector.Reset()
-	vec.queryParsed = false
 }

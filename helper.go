@@ -4,15 +4,19 @@ import (
 	"github.com/koykov/vector"
 )
 
-var (
-	urlHelper = &URLHelper{}
+const (
+	flagEscape = uint8(1)
 )
 
 type URLHelper struct{}
 
+var (
+	urlHelper = &URLHelper{}
+)
+
 func (h *URLHelper) ConvertByteptr(p *vector.Byteptr) []byte {
 	b := p.RawBytes()
-	if p.GetFlag(vector.FlagEscape) {
+	if p.CheckFlag(flagEscape) {
 		return unescape(b)
 	}
 	return b
