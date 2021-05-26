@@ -302,12 +302,12 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	for {
 		kv, k, v = nil, nil, nil
 
-		i := bytealg.IndexByteAtRL(origin, '&', offset)
+		i := bytealg.IndexByteAtLR(origin, '&', offset)
 		if i < 0 {
 			i = len(origin)
 		}
 		kv = origin[offset:i]
-		j := bytealg.IndexByteAtRL(kv, '=', 0)
+		j := bytealg.IndexByteAtLR(kv, '=', 0)
 		if j < 0 {
 			k = kv
 		} else {
@@ -329,7 +329,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			node, idx = vec.GetChildWT(root, 3, vector.TypeStr)
 			if len(v) > 0 {
 				node.Value().Init(origin, offset+len(k)+1, len(v))
-				node.Value().SetFlag(flagEscape, bytealg.IndexByteAtRL(v, '%', 0) >= 0)
+				node.Value().SetFlag(flagEscape, bytealg.IndexByteAtLR(v, '%', 0) >= 0)
 			}
 			vec.PutNode(idx, node)
 			vec.PutNode(root.Index(), root)
@@ -338,7 +338,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			node.Key().Init(origin, offset, len(k))
 			if len(v) > 0 {
 				node.Value().Init(origin, offset+len(k)+1, len(v))
-				node.Value().SetFlag(flagEscape, bytealg.IndexByteAtRL(v, '%', 0) >= 0)
+				node.Value().SetFlag(flagEscape, bytealg.IndexByteAtLR(v, '%', 0) >= 0)
 			}
 			vec.PutNode(idx, node)
 		}
