@@ -20,7 +20,7 @@ const (
 	idxHash        = 11
 	idxQuery       = 12
 
-	flagQueryParsed = uint8(1)
+	flagQueryParsed = 0
 )
 
 // Parser object.
@@ -104,8 +104,8 @@ func (vec *Vector) Path() *vector.Node {
 // Get query node.
 func (vec *Vector) Query() *vector.Node {
 	query := vec.GetByIdx(idxQuery)
-	if !vec.CheckFlag(flagQueryParsed) {
-		vec.SetFlag(flagQueryParsed, true)
+	if !vec.CheckBit(flagQueryParsed) {
+		vec.SetBit(flagQueryParsed, true)
 		vec.parseQueryParams(query)
 	}
 	return query

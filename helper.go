@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	flagEscape = uint8(1)
+	flagEscape = 0
 )
 
 type URLHelper struct{}
@@ -16,7 +16,7 @@ var (
 
 func (h *URLHelper) ConvertByteptr(p *vector.Byteptr) []byte {
 	b := p.RawBytes()
-	if p.CheckFlag(flagEscape) {
+	if p.CheckBit(flagEscape) {
 		return unescape(b)
 	}
 	return b
