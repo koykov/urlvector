@@ -63,7 +63,7 @@ func (vec *Vector) SetPathString(path string) *Vector {
 
 func (vec *Vector) SetQueryBytes(query []byte) *Vector {
 	vec.SetBit(flagQueryParsed, false)
-	return vec.set(vec.Query(), query)
+	return vec.set(vec.queryOrigin(), query)
 }
 
 func (vec *Vector) SetQueryString(query string) *Vector {
@@ -79,6 +79,7 @@ func (vec *Vector) SetHashString(hash string) *Vector {
 }
 
 func (vec *Vector) set(node *vector.Node, s []byte) *Vector {
+	vec.SetBit(flagBufMod, true)
 	offset := vec.BufLen()
 	vec.BufAppend(s)
 	node.Value().Init(vec.Buf(), offset, len(s))

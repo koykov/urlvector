@@ -71,6 +71,7 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 	if err = vec.SetSrc(s, copy); err != nil {
 		return
 	}
+	vec.SetBit(flagCopy, copy)
 
 	offset := 0
 	// Create root node and register it.
@@ -100,7 +101,7 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 	}
 
 	// Return root node back to the vector.
-	vec.PutNode(i, root)
+	vec.putNode(i, root)
 
 	// Check unparsed tail.
 	if offset < vec.SrcLen() {
@@ -136,8 +137,8 @@ func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error
 		offset += 2
 	}
 
-	vec.PutNode(isc, scheme)
-	vec.PutNode(isl, slashes)
+	vec.putNode(isc, scheme)
+	vec.putNode(isl, slashes)
 
 	return offset, err
 }
@@ -174,9 +175,9 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 		offset = posAt + 1
 	}
 
-	vec.PutNode(ia, auth)
-	vec.PutNode(iu, username)
-	vec.PutNode(ip, password)
+	vec.putNode(ia, auth)
+	vec.putNode(iu, username)
+	vec.putNode(ip, password)
 
 	return offset, err
 }
@@ -221,9 +222,9 @@ loop:
 		hostname.Value().Init(vec.Src(), offset, posSl-offset)
 	}
 
-	vec.PutNode(ih, host)
-	vec.PutNode(in, hostname)
-	vec.PutNode(ip, port)
+	vec.putNode(ih, host)
+	vec.putNode(in, hostname)
+	vec.putNode(ip, port)
 
 	offset = posSl
 
@@ -251,7 +252,7 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 		offset = posQM
 	}
 
-	vec.PutNode(i, path)
+	vec.putNode(i, path)
 
 	return offset, err
 }
@@ -281,9 +282,9 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 		offset = vec.SrcLen()
 	}
 
-	vec.PutNode(iqo, queryOrig)
-	vec.PutNode(ih, hash)
-	vec.PutNode(iq, query)
+	vec.putNode(iqo, queryOrig)
+	vec.putNode(ih, hash)
+	vec.putNode(iq, query)
 
 	return offset, err
 }
@@ -331,7 +332,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 				node.Value().Init(origin, offset+len(k)+1, len(v))
 				node.Value().SetBit(flagEscape, bytealg.IndexByteAtLR(v, '%', 0) >= 0)
 			}
-			vec.PutNode(idx, node)
+			vec.putNode(idx, node)
 			vec.PutNode(root.Index(), root)
 		} else {
 			node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
@@ -340,7 +341,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 				node.Value().Init(origin, offset+len(k)+1, len(v))
 				node.Value().SetBit(flagEscape, bytealg.IndexByteAtLR(v, '%', 0) >= 0)
 			}
-			vec.PutNode(idx, node)
+			vec.putNode(idx, node)
 		}
 
 		offset = i + 1
@@ -348,7 +349,18 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			break
 		}
 	}
-	vec.PutNode(query.Index(), query)
+	vec.putNode(query.Index(), query)
+}
+
+func (vec *Vector) putNode(idx int, node *vector.Node) {
+	vec.ensureFlags(node)
+	vec.PutNode(idx, node)
+}
+
+func (vec *Vector) ensureFlags(node *vector.Node) {
+	if vec.CheckBit(flagCopy) {
+		node.Value().SetBit(flagBufSrc, true)
+	}
 }
 
 func max(a, b int) int {

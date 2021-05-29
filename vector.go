@@ -20,9 +20,13 @@ const (
 	idxHash        = 11
 	idxQuery       = 12
 
-	flagQueryParsed = 0
-	flagEscape      = 0
-	flagBufSrc      = 1
+	// Vector level flags.
+	flagCopy        = 8
+	flagBufMod      = 9
+	flagQueryParsed = 10
+	// Byteptr level flags.
+	flagEscape = 8
+	flagBufSrc = 9
 )
 
 // Parser object.
@@ -125,7 +129,7 @@ func (vec *Vector) Hash() *vector.Node {
 
 func (vec *Vector) getByIdx(idx int) *vector.Node {
 	node := vec.GetByIdx(idx)
-	if node.Value().CheckBit(flagBufSrc) {
+	if node.Value().CheckBit(flagBufSrc) && vec.CheckBit(flagBufMod) {
 		node.Value().TakeAddr(vec.Buf())
 	}
 	return node
