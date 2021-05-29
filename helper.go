@@ -4,10 +4,6 @@ import (
 	"github.com/koykov/vector"
 )
 
-const (
-	flagEscape = 0
-)
-
 type URLHelper struct{}
 
 var (

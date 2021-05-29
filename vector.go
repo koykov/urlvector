@@ -21,6 +21,8 @@ const (
 	idxQuery       = 12
 
 	flagQueryParsed = 0
+	flagEscape      = 0
+	flagBufSrc      = 1
 )
 
 // Parser object.
@@ -57,53 +59,53 @@ func (vec *Vector) ParseCopyStr(s string) error {
 
 // Get scheme node.
 func (vec *Vector) Scheme() *vector.Node {
-	return vec.GetByIdx(idxScheme)
+	return vec.getByIdx(idxScheme)
 }
 
 // Returns true if URL is started with slashes.
 func (vec *Vector) Slashes() bool {
-	return vec.GetByIdx(idxSlashes).Bool()
+	return vec.getByIdx(idxSlashes).Bool()
 }
 
 // Get auth node (contains both username and password substrings).
 func (vec *Vector) Auth() *vector.Node {
-	return vec.GetByIdx(idxAuth)
+	return vec.getByIdx(idxAuth)
 }
 
 // Get username node.
 func (vec *Vector) Username() *vector.Node {
-	return vec.GetByIdx(idxUsername)
+	return vec.getByIdx(idxUsername)
 }
 
 // Get password node.
 func (vec *Vector) Password() *vector.Node {
-	return vec.GetByIdx(idxPassword)
+	return vec.getByIdx(idxPassword)
 }
 
 // Get host node (contains both hostname/IP and port substrings).
 func (vec *Vector) Host() *vector.Node {
-	return vec.GetByIdx(idxHost)
+	return vec.getByIdx(idxHost)
 }
 
 // Get hostname node (similar to Host(), but excludes port).
 func (vec *Vector) Hostname() *vector.Node {
-	return vec.GetByIdx(idxHostname)
+	return vec.getByIdx(idxHostname)
 }
 
 // Get port as integer.
 func (vec *Vector) Port() int {
-	i, _ := vec.GetByIdx(idxPort).Int()
+	i, _ := vec.getByIdx(idxPort).Int()
 	return int(i)
 }
 
 // Get path node.
 func (vec *Vector) Path() *vector.Node {
-	return vec.GetByIdx(idxPath)
+	return vec.getByIdx(idxPath)
 }
 
 // Get query node.
 func (vec *Vector) Query() *vector.Node {
-	query := vec.GetByIdx(idxQuery)
+	query := vec.getByIdx(idxQuery)
 	if !vec.CheckBit(flagQueryParsed) {
 		vec.SetBit(flagQueryParsed, true)
 		vec.parseQueryParams(query)
@@ -113,10 +115,18 @@ func (vec *Vector) Query() *vector.Node {
 
 // Internal query getter.
 func (vec *Vector) queryOrigin() *vector.Node {
-	return vec.GetByIdx(idxQueryOrigin)
+	return vec.getByIdx(idxQueryOrigin)
 }
 
 // Get hash node.
 func (vec *Vector) Hash() *vector.Node {
-	return vec.GetByIdx(idxHash)
+	return vec.getByIdx(idxHash)
+}
+
+func (vec *Vector) getByIdx(idx int) *vector.Node {
+	node := vec.GetByIdx(idx)
+	if node.Value().CheckBit(flagBufSrc) {
+		node.Value().TakeAddr(vec.Buf())
+	}
+	return node
 }
