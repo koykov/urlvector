@@ -143,6 +143,9 @@ var (
 	query1 = []byte("http://x.com/1?x&y=1&z")
 	query2 = []byte("http://x.com/x/y/z?arr[]=1&arr[]=2&arr[]=3&b=x&arr1[]=a&arr1[]=b&arr1[]=c")
 
+	query3     = []byte("http://x.com/a/b/c?x=1&y=qwerty&z=foo")
+	query3repl = []byte("?foo=x&bar=y&a[]=1&a[]=2&b[]=qwe&a[]=c&b[]=rty&z")
+
 	vec = NewVector()
 )
 
@@ -254,6 +257,26 @@ func TestVector_Set(t *testing.T) {
 	if h := vec.HostnameString(); h != "x.com" {
 		t.Error("query 2 mismatch query param arr1[0]", "need", "x.com", "got", h)
 	}
+}
+
+func TestVector_ForgetQueryParams(t *testing.T) {
+	vec.Reset()
+	_ = vec.Parse(query3)
+	if y := vec.Query().GetString("y"); y != "qwerty" {
+		t.Error("query 3 mismatch query param y", "need", "qwerty", "got", y)
+	}
+	vec.SetQueryBytes(query3repl)
+	vec.Query().Each(func(_ int, node *vector.Node) {
+		switch node.Type() {
+		case vector.TypeArr:
+			t.Logf("%s:", node.KeyString())
+			node.Each(func(_ int, cnode *vector.Node) {
+				t.Log("->", cnode.String())
+			})
+		default:
+			t.Log(node.KeyString(), node.String())
+		}
+	})
 }
 
 func BenchmarkVector_Parse(b *testing.B) {
