@@ -267,14 +267,22 @@ func TestVector_ForgetQueryParams(t *testing.T) {
 	}
 	vec.SetQueryBytes(query3repl)
 	vec.Query().Each(func(_ int, node *vector.Node) {
-		switch node.Type() {
-		case vector.TypeArr:
-			t.Logf("%s:", node.KeyString())
-			node.Each(func(_ int, cnode *vector.Node) {
-				t.Log("->", cnode.String())
-			})
-		default:
-			t.Log(node.KeyString(), node.String())
+		switch {
+		case node.KeyString() == "foo":
+			if node.String() != "x" {
+				t.Error("query 3 (forget) mismatch query param", node.KeyString(), "need", "x", "got", node.String())
+			}
+		case node.KeyString() == "bar":
+			if node.String() != "y" {
+				t.Error("query 3 (forget) mismatch query param", node.KeyString(), "need", "y", "got", node.String())
+			}
+		case node.KeyString() == "a[]":
+			if node.Limit() != 3 {
+				t.Error("query 2 (forget) unexpected length of param a[]", "need", 3, "got", node.Limit())
+			}
+			if node.At(0).String() != "1" {
+				t.Error("query 2 (forget) mismatch query param a[0]", "need", "1", "got", node.At(0).String())
+			}
 		}
 	})
 }
@@ -472,5 +480,36 @@ func benchSet(b *testing.B, cpy bool) {
 		if len(tst.target.hash) > 0 && vec.HashString() != tst.target.hash {
 			printErr(b, &tst, "hash mismatch", vec.HashString(), "vs", tst.target.hash)
 		}
+	}
+}
+
+func BenchmarkVector_ForgetQueryParams(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		vec.Reset()
+		_ = vec.Parse(query3)
+		if y := vec.Query().GetString("y"); y != "qwerty" {
+			b.Error("query 3 mismatch query param y", "need", "qwerty", "got", y)
+		}
+		vec.SetQueryBytes(query3repl)
+		vec.Query().Each(func(_ int, node *vector.Node) {
+			switch {
+			case node.KeyString() == "foo":
+				if node.String() != "x" {
+					b.Error("query 3 (forget) mismatch query param", node.KeyString(), "need", "x", "got", node.String())
+				}
+			case node.KeyString() == "bar":
+				if node.String() != "y" {
+					b.Error("query 3 (forget) mismatch query param", node.KeyString(), "need", "y", "got", node.String())
+				}
+			case node.KeyString() == "a[]":
+				if node.Limit() != 3 {
+					b.Error("query 2 (forget) unexpected length of param a[]", "need", 3, "got", node.Limit())
+				}
+				if node.At(0).String() != "1" {
+					b.Error("query 2 (forget) mismatch query param a[0]", "need", "1", "got", node.At(0).String())
+				}
+			}
+		})
 	}
 }
