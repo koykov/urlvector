@@ -144,7 +144,7 @@ var (
 	query2 = []byte("http://x.com/x/y/z?arr[]=1&arr[]=2&arr[]=3&b=x&arr1[]=a&arr1[]=b&arr1[]=c")
 
 	query3     = []byte("http://x.com/a/b/c?x=1&y=qwerty&z=foo")
-	query3repl = []byte("?foo=x&bar=y&a[]=1&a[]=2&b[]=qwe&a[]=c&b[]=rty&z")
+	query3repl = []byte("?foo=x&bar=y&a[]=1&a[]=2&a[]=c&b[]=qwe&b[]=rty&z")
 
 	vec = NewVector()
 )
