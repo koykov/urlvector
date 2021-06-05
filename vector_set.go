@@ -64,7 +64,9 @@ func (vec *Vector) SetPathString(path string) *Vector {
 func (vec *Vector) SetQueryBytes(query []byte) *Vector {
 	vec.SetBit(flagQueryParsed, false)
 	vec.ForgetFrom(idxQuery + 1)
-	vec.GetByIdx(idxQuery).ResetIndex()
+	node := vec.GetByIdx(idxQuery)
+	vec.Index.Reset(node.Depth(), node.Offset())
+	node.SetLimit(0)
 	return vec.set(vec.queryOrigin(), query)
 }
 
