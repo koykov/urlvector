@@ -352,17 +352,20 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	vec.putNode(query.Index(), query)
 }
 
+// Call vector.PutNode() and set required flags before.
 func (vec *Vector) putNode(idx int, node *vector.Node) {
 	vec.ensureFlags(node)
 	vec.PutNode(idx, node)
 }
 
+// Consider source origin and set flags.
 func (vec *Vector) ensureFlags(node *vector.Node) {
 	if vec.CheckBit(flagCopy) {
 		node.Value().SetBit(flagBufSrc, true)
 	}
 }
 
+// Int version of math.Max().
 func max(a, b int) int {
 	if a > b {
 		return a

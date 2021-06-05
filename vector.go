@@ -127,6 +127,7 @@ func (vec *Vector) Hash() *vector.Node {
 	return vec.getByIdx(idxHash)
 }
 
+// Get node by index considering flags.
 func (vec *Vector) getByIdx(idx int) *vector.Node {
 	node := vec.GetByIdx(idx)
 	if node.Value().CheckBit(flagBufSrc) && vec.CheckBit(flagBufMod) {
