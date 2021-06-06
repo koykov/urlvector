@@ -65,6 +65,18 @@ func (vec *Vector) SetHostnameString(hostname string) *Vector {
 	return vec.SetHostnameBytes(fastconv.S2B(hostname))
 }
 
+// Replace port.
+func (vec *Vector) SetPort(port int) *Vector {
+	vec.SetBit(flagBufMod, true)
+	offset := vec.BufLen()
+	vec.BufAppendInt(int64(port))
+	l := vec.BufLen() - offset
+	node := vec.getByIdx(idxPort)
+	node.Value().Init(vec.Buf(), offset, l)
+	node.Value().SetBit(flagBufSrc, true)
+	return vec
+}
+
 // Replace path with bytes.
 func (vec *Vector) SetPathBytes(path []byte) *Vector {
 	return vec.set(vec.Path(), path)

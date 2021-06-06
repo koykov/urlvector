@@ -257,6 +257,10 @@ func TestVector_Set(t *testing.T) {
 	if h := vec.HostnameString(); h != "x.com" {
 		t.Error("query 2 mismatch query param arr1[0]", "need", "x.com", "got", h)
 	}
+	vec.SetPort(9999)
+	if p := vec.Port(); p != 9999 {
+		t.Error("query 2 mismatch query param port", "need", 9999, "got", p)
+	}
 }
 
 func TestVector_ForgetQueryParams(t *testing.T) {
@@ -443,6 +447,7 @@ func benchSet(b *testing.B, cpy bool) {
 			SetUsernameString("marquis_warren").
 			SetPasswordString("major").
 			SetHostnameString("x.com").
+			SetPort(9999).
 			SetPathString("/h8").
 			SetQueryString("?x=1").
 			SetHashString("#anc")
@@ -467,6 +472,9 @@ func benchSet(b *testing.B, cpy bool) {
 		}
 		if len(tst.target.hostname) > 0 && vec.HostnameString() != tst.target.hostname {
 			printErr(b, &tst, "hostname mismatch", vec.HostnameString(), "vs", tst.target.hostname)
+		}
+		if vec.Port() != 9999 {
+			printErr(b, &tst, "port mismatch", vec.Port(), "vs", 9999)
 		}
 		if tst.target.port > 0 && vec.Port() != tst.target.port {
 			printErr(b, &tst, "port mismatch", vec.Port(), "vs", tst.target.port)
