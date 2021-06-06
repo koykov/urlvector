@@ -1,6 +1,7 @@
 package urlvector
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/koykov/vector"
@@ -145,6 +146,7 @@ var (
 
 	query3     = []byte("http://x.com/a/b/c?x=1&y=qwerty&z=foo")
 	query3repl = []byte("?foo=x&bar=y&a[]=1&a[]=2&a[]=c&b[]=qwe&b[]=rty&z")
+	query3new  = []byte("https://foo:bar@google.com:8080/search?q=keys#results")
 
 	vec = NewVector()
 )
@@ -289,6 +291,23 @@ func TestVector_ForgetQueryParams(t *testing.T) {
 			}
 		}
 	})
+}
+
+func TestVector_String(t *testing.T) {
+	vec.Reset()
+	_ = vec.Parse(query3)
+
+	vec.SetSchemeString("https").
+		SetUsernameString("foo").
+		SetPasswordString("bar").
+		SetHostnameString("google.com").
+		SetPort(8080).
+		SetPathString("search").
+		SetQueryString("q=keys").
+		SetHashString("results")
+	if n := vec.Bytes(); !bytes.Equal(n, query3new) {
+		t.Error("url assembly failed", "need", string(query3new), "got", string(n))
+	}
 }
 
 func BenchmarkVector_Parse(b *testing.B) {
@@ -519,5 +538,26 @@ func BenchmarkVector_ForgetQueryParams(b *testing.B) {
 				}
 			}
 		})
+	}
+}
+
+func BenchmarkVector_String(b *testing.B) {
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		vec.Reset()
+		_ = vec.Parse(query3)
+
+		vec.SetSchemeString("https").
+			SetUsernameString("foo").
+			SetPasswordString("bar").
+			SetHostnameString("google.com").
+			SetPort(8080).
+			SetPathString("search").
+			SetQueryString("q=keys").
+			SetHashString("results")
+		if n := vec.Bytes(); !bytes.Equal(n, query3new) {
+			b.Error("url assembly failed", "need", string(query3new), "got", string(n))
+		}
 	}
 }
