@@ -206,7 +206,7 @@ func TestVector_ParseQuery(t *testing.T) {
 	var query *vector.Node
 
 	vec.Reset()
-	_ = vec.Parse(query0)
+	_ = vec.ParseCopy(query0)
 	query = vec.Query()
 	query.Each(func(_ int, node *vector.Node) {
 		k := node.KeyString()
