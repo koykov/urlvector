@@ -38,3 +38,11 @@ arr1[] -> a
 arr1[] -> b
 arr1[] -> c
 ```
+
+## Performance
+
+See [versus](https://github.com/koykov/versus) project for performance comparison between urlvector and [net/url](https://golang.org/pkg/net/url/) packages:
+```
+BenchmarkParseUrl-8         	  143672	      7921 ns/op	    2920 B/op	      22 allocs/op
+BenchmarkParseUrlvector-8   	  318135	      3339 ns/op	       0 B/op	       0 allocs/op
+```
