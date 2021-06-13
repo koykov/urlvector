@@ -43,6 +43,12 @@ arr1[] -> c
 
 See [versus](https://github.com/koykov/versus) project for performance comparison between urlvector and [net/url](https://golang.org/pkg/net/url/) packages:
 ```
-BenchmarkParseUrl-8         	  143672	      7921 ns/op	    2920 B/op	      22 allocs/op
-BenchmarkParseUrlvector-8   	  318135	      3339 ns/op	       0 B/op	       0 allocs/op
+BenchmarkNetUrl_ParseUrl-8        	 1027659	      1139 ns/op	     192 B/op	       2 allocs/op
+BenchmarkNetUrl_ParseQuery-8      	  153732	      7690 ns/op	    2919 B/op	      22 allocs/op
+BenchmarkNetUrl_ModHost-8         	  704062	      1799 ns/op	     840 B/op	       7 allocs/op
+BenchmarkNetUrl_ModQuery-8        	   86022	     14279 ns/op	    5649 B/op	      42 allocs/op
+BenchmarkUrlvector_ParseUrl-8     	 1000000	      1107 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUrlvector_ParseQuery-8   	  337450	      3489 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUrlvector_ModHost-8      	  796296	      1317 ns/op	       0 B/op	       0 allocs/op
+BenchmarkUrlvector_ModQuery-8     	  290557	      4110 ns/op	       0 B/op	       0 allocs/op
 ```
