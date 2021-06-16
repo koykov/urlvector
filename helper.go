@@ -13,7 +13,9 @@ var (
 func (h *URLHelper) ConvertByteptr(p *vector.Byteptr) []byte {
 	b := p.RawBytes()
 	if p.CheckBit(flagEscape) {
-		return unescape(b)
+		p.SetBit(flagEscape, false)
+		b = unescape(b)
+		p.SetLimit(len(b))
 	}
 	return b
 }
