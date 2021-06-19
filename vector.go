@@ -27,6 +27,7 @@ const (
 	flagBufMod      = 9
 	flagQueryParsed = 10
 	flagQuerySorted = 11
+	flagQueryMod    = 12
 	// Byteptr level flags.
 	flagEscape = 8
 	flagBufSrc = 9
@@ -179,20 +180,47 @@ func (vec *Vector) Query() *vector.Node {
 	return query
 }
 
-// Get query node with sorted query params order.
-func (vec *Vector) QuerySorted() *vector.Node {
+// Sort query params an AB order.
+func (vec *Vector) QuerySort() *Vector {
 	query := vec.Query()
 	if !vec.CheckBit(flagQuerySorted) {
 		vec.SetBit(flagQuerySorted, true)
 		children := nodes(query.Children())
 		sort.Sort(&children)
+		vec.SetBit(flagQueryMod, true)
 	}
-	return query
+	return vec
 }
 
 // Internal query getter.
 func (vec *Vector) queryOrigin() *vector.Node {
-	return vec.getByIdx(idxQueryOrigin)
+	queryOrigin := vec.getByIdx(idxQueryOrigin)
+
+	if vec.CheckBit(flagQueryMod) {
+		vec.SetBit(flagQueryMod, false)
+		offset := vec.BufLen()
+		limit := 1
+		vec.BufAppendStr("?")
+		query := vec.getByIdx(idxQuery)
+		query.Each(func(idx int, node *vector.Node) {
+			if idx > 0 {
+				vec.BufAppendStr("&")
+				limit++
+			}
+			key := node.KeyString()
+			val := node.RawBytes() // todo escape me before write to buffer
+			vec.BufAppendStr(key)
+			vec.BufAppendStr("=")
+			vec.BufAppend(val)
+			limit += len(key) + len(val) + 1
+		})
+		vec.SetBit(flagBufMod, true)
+
+		queryOrigin.Value().Init(vec.Buf(), offset, limit)
+		queryOrigin.Value().SetBit(flagBufSrc, true)
+		vec.PutNode(queryOrigin.Index(), queryOrigin)
+	}
+	return queryOrigin
 }
 
 // Get hash node.

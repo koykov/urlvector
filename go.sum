@@ -6,7 +6,7 @@ github.com/koykov/byteptr v0.0.0-20210523211723-1485d5f4f9ef h1:d78RfXRfc2HKKqgK
 github.com/koykov/byteptr v0.0.0-20210523211723-1485d5f4f9ef/go.mod h1:LG7b4GrG4UaWlEyjY149VXH6Mq3MB1AHNT4pGuEcvkg=
 github.com/koykov/fastconv v0.0.0-20200216201335-c0ba44f9d207 h1:7O5l39lvbODHwriV0iKBvkpTE0YsVw75Fj9FpzU38Pw=
 github.com/koykov/fastconv v0.0.0-20200216201335-c0ba44f9d207/go.mod h1:JXdtdh0aCcSmxLsVUoYP61lmxpL6dWOXEKxCIR+MlGg=
-github.com/koykov/vector v0.0.0-20210619115352-69b99b4a40d1 h1:70mDazF+Tw5Mt91E0pi/hwiVYcYTrK29jDVGL/cf2Zs=
-github.com/koykov/vector v0.0.0-20210619115352-69b99b4a40d1/go.mod h1:2rIxbWK40M19Tu/J7+Q5vfRFTyaKoCnvbKtDBzN26zs=
+github.com/koykov/vector v0.0.0-20210619131333-1a7182681771 h1:xrUB9T6rH+C1EttX1uGGhVlZPl9FiBpjwUmrVk7E8cg=
+github.com/koykov/vector v0.0.0-20210619131333-1a7182681771/go.mod h1:2rIxbWK40M19Tu/J7+Q5vfRFTyaKoCnvbKtDBzN26zs=
 github.com/koykov/x2bytes v0.0.0-20210125202922-e56731f1055a h1:toVWeFXfGurBG8ibs7sPLIdabEYA3uLKrCh4eHH8ZGw=
 github.com/koykov/x2bytes v0.0.0-20210125202922-e56731f1055a/go.mod h1:WYC0GA70RW4XAE3FRTVCYmC8UhHO3LEm26g795qn7Jo=
