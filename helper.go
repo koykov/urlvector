@@ -10,7 +10,7 @@ var (
 	urlHelper = &URLHelper{}
 )
 
-func (h *URLHelper) ConvertByteptr(p *vector.Byteptr) []byte {
+func (h *URLHelper) Indirect(p *vector.Byteptr) []byte {
 	b := p.RawBytes()
 	if p.CheckBit(flagEscape) {
 		p.SetBit(flagEscape, false)

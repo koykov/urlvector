@@ -1,6 +1,8 @@
 package urlvector
 
 import (
+	"sort"
+
 	"github.com/koykov/fastconv"
 	"github.com/koykov/vector"
 )
@@ -24,6 +26,7 @@ const (
 	flagCopy        = 8
 	flagBufMod      = 9
 	flagQueryParsed = 10
+	flagQuerySorted = 11
 	// Byteptr level flags.
 	flagEscape = 8
 	flagBufSrc = 9
@@ -166,12 +169,23 @@ func (vec *Vector) Path() *vector.Node {
 	return vec.getByIdx(idxPath)
 }
 
-// Get query node.
+// Get query node with origin query params order.
 func (vec *Vector) Query() *vector.Node {
 	query := vec.getByIdx(idxQuery)
 	if !vec.CheckBit(flagQueryParsed) {
 		vec.SetBit(flagQueryParsed, true)
 		vec.parseQueryParams(query)
+	}
+	return query
+}
+
+// Get query node with sorted query params order.
+func (vec *Vector) QuerySorted() *vector.Node {
+	query := vec.Query()
+	if !vec.CheckBit(flagQuerySorted) {
+		vec.SetBit(flagQuerySorted, true)
+		children := nodes(query.Children())
+		sort.Sort(&children)
 	}
 	return query
 }
