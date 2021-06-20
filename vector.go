@@ -87,7 +87,7 @@ func (vec *Vector) Bytes() []byte {
 
 	if hostname := vec.HostnameBytes(); len(hostname) > 0 {
 		vec.BufAppend(hostname)
-		if port := vec.getByIdx(idxPort); port.Value().Limit() > 0 {
+		if port := vec.getByIdx(idxPort); port.Value().Len() > 0 {
 			vec.BufAppend(bColon)
 			vec.BufAppend(port.Bytes())
 		}

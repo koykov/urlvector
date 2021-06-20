@@ -15,7 +15,7 @@ func (h *URLHelper) Indirect(p *vector.Byteptr) []byte {
 	if p.CheckBit(flagEscape) {
 		p.SetBit(flagEscape, false)
 		b = unescape(b)
-		p.SetLimit(len(b))
+		p.SetLen(len(b))
 	}
 	return b
 }
