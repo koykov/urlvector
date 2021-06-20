@@ -1,8 +1,6 @@
 package urlvector
 
 import (
-	"sort"
-
 	"github.com/koykov/fastconv"
 	"github.com/koykov/vector"
 )
@@ -185,8 +183,8 @@ func (vec *Vector) QuerySort() *Vector {
 	query := vec.Query()
 	if !vec.CheckBit(flagQuerySorted) {
 		vec.SetBit(flagQuerySorted, true)
-		children := nodes(query.Children())
-		sort.Sort(&children)
+		children := query.Children()
+		quickSort(children, 0, len(children)-1)
 		vec.SetBit(flagQueryMod, true)
 	}
 	return vec
@@ -208,10 +206,9 @@ func (vec *Vector) queryOrigin() *vector.Node {
 				limit++
 			}
 			key := node.KeyString()
-			val := node.RawBytes() // todo escape me before write to buffer
 			vec.BufAppendStr(key)
 			vec.BufAppendStr("=")
-			vec.BufAppend(val)
+			val := escape(vec, node.RawBytes())
 			limit += len(key) + len(val) + 1
 		})
 		vec.SetBit(flagBufMod, true)

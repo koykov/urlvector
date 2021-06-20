@@ -140,6 +140,8 @@ var (
 		"subage":       "102",
 		"language":     "ru",
 	}
+	query0sorted = []byte("?blockID=319385&clientNotice=true&cur=RUB&domain=ultra-software-base.ru&format=json&imgX=360&imgY=240&ip=5.5.5.5&language=ru&limit=1&page=https%253A%252F%252Fultra-software-base.ru%252Fsystem%252Fgoogle-chrome.html%253Fyclid%253D212247430717539672&subage=102&subage_dt=2021-01-29&ua=Mozilla%252F5.0%2B%2528Windows%2BNT%2B6.1%253B%2BWin64%253B%2Bx64%2529%2BAppleWebKit%252F537.36%2B%2528KHTML%252C%2Blike%2BGecko%2529%2BChrome%252F89.0.4389.105%2BYaBrowser%252F21.3.3.230%2BYowser%252F2.5%2BSafari%252F537.36&uid=4f5d0edc-3a3e-48d0-9872-0b48a7998ac6&v=default")
+	// 16, 1, 11, 4, 15, 2, 6, 7, 10, 13, 5, 3, 14, 8, 12, 9
 
 	query1 = []byte("http://x.com/1?x&y=1&z")
 	query2 = []byte("http://x.com/x/y/z?arr[]=1&arr[]=2&arr[]=3&b=x&arr1[]=a&arr1[]=b&arr1[]=c")
@@ -307,6 +309,15 @@ func TestVector_String(t *testing.T) {
 		SetHashString("results")
 	if n := vec.Bytes(); !bytes.Equal(n, query3new) {
 		t.Error("url assembly failed", "need", string(query3new), "got", string(n))
+	}
+}
+
+func TestVector_QuerySort(t *testing.T) {
+	vec.Reset()
+	_ = vec.ParseCopy(query0)
+	mod := vec.QuerySort().QueryBytes()
+	if !bytes.Equal(mod, query0sorted) {
+		t.Error("query 0 sort failed", "\nneed", string(query0sorted), "\n got", string(mod))
 	}
 }
 
@@ -558,6 +569,19 @@ func BenchmarkVector_String(b *testing.B) {
 			SetHashString("results")
 		if n := vec.Bytes(); !bytes.Equal(n, query3new) {
 			b.Error("url assembly failed", "need", string(query3new), "got", string(n))
+		}
+	}
+}
+
+func BenchmarkVector_QuerySort(b *testing.B) {
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		vec.Reset()
+		_ = vec.ParseCopy(query0)
+		mod := vec.QuerySort().QueryBytes()
+		if !bytes.Equal(mod, query0sorted) {
+			b.Error("query 0 sort failed", "need", string(query0sorted), "got", string(mod))
 		}
 	}
 }
