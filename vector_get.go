@@ -80,6 +80,14 @@ func (vec *Vector) QueryString() string {
 	return vec.queryOrigin().String()
 }
 
+// Get length of the raw query without question mark symbol.
+func (vec *Vector) QueryLen() int {
+	if l := len(vec.QueryBytes()) - 1; l >= 0 {
+		return l
+	}
+	return 0
+}
+
 // Get hash as bytes.
 func (vec *Vector) HashBytes() []byte {
 	return vec.Hash().Bytes()
