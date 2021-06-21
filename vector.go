@@ -122,7 +122,7 @@ func (vec *Vector) bytes(esc bool) []byte {
 			vec.BufAppend(bSlash)
 		}
 		if esc {
-			escape(vec, path)
+			queryEscape(vec, path)
 		} else {
 			vec.BufAppend(path)
 		}
@@ -140,7 +140,7 @@ func (vec *Vector) bytes(esc bool) []byte {
 			vec.BufAppend(bHash)
 		}
 		if esc {
-			escape(vec, hash)
+			queryEscape(vec, hash)
 		} else {
 			vec.BufAppend(hash)
 		}
@@ -235,7 +235,7 @@ func (vec *Vector) queryOrigin() *vector.Node {
 			key := node.KeyString()
 			vec.BufAppendStr(key)
 			vec.BufAppendStr("=")
-			val := escape(vec, node.RawBytes())
+			val := queryEscape(vec, node.RawBytes())
 			limit += len(key) + len(val) + 1
 		})
 		vec.SetBit(flagBufMod, true)

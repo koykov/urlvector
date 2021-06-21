@@ -9,7 +9,7 @@ const (
 // QueryEscape escapes the string so it can be safely placed inside a URL query.
 func QueryUnescape(dst, p []byte) []byte {
 	dst = append(dst, p...)
-	return unescape(dst)
+	return queryUnescape(dst)
 }
 
 // QueryUnescape does the inverse transformation of QueryEscape.
@@ -34,8 +34,36 @@ func QueryEscape(dst, p []byte) []byte {
 	return dst
 }
 
+// PathEscape escapes the string so it can be safely placed inside a URL query.
+func PathUnescape(dst, p []byte) []byte {
+	dst = append(dst, p...)
+	return pathUnescape(dst)
+}
+
+// PathUnescape does the inverse transformation of PathEscape.
+func PathEscape(dst, p []byte) []byte {
+	l := len(p)
+	if l == 0 {
+		return dst
+	}
+	_ = p[l-1]
+	for i := 0; i < l; i++ {
+		if (p[i] >= 'a' && p[i] <= 'z' || p[i] >= 'A' && p[i] <= 'Z' ||
+			p[i] >= '0' && p[i] <= '9' || p[i] == '-' || p[i] == '.' || p[i] == '_') && p[i] != '?' {
+			dst = append(dst, p[i])
+		} else if p[i] == ' ' {
+			dst = append(dst, '+')
+		} else {
+			dst = append(dst, '%')
+			dst = append(dst, hexUp[p[i]>>4])
+			dst = append(dst, hexUp[p[i]&15])
+		}
+	}
+	return dst
+}
+
 // Unescape byte array using itself as a destination.
-func unescape(p []byte) []byte {
+func queryUnescape(p []byte) []byte {
 	l := len(p)
 	n := len(p)
 	if l < 3 {
@@ -62,13 +90,30 @@ func unescape(p []byte) []byte {
 }
 
 // Query escape p using vec buffer.
-func escape(vec *Vector, p []byte) []byte {
+func queryEscape(vec *Vector, p []byte) []byte {
 	l := len(p)
 	if l == 0 {
 		return p
 	}
 	o := vec.BufLen()
 	buf := QueryEscape(vec.Buf(), p)
+	vec.BufUpdateWith(buf)
+	return vec.Buf()[o:]
+}
+
+// Unescape byte array using itself as a destination.
+func pathUnescape(p []byte) []byte {
+	return queryUnescape(p)
+}
+
+// Query escape p using vec buffer.
+func pathEscape(vec *Vector, p []byte) []byte {
+	l := len(p)
+	if l == 0 {
+		return p
+	}
+	o := vec.BufLen()
+	buf := PathEscape(vec.Buf(), p)
 	vec.BufUpdateWith(buf)
 	return vec.Buf()[o:]
 }
