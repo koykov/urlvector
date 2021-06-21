@@ -240,6 +240,9 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 	if offset < vec.SrcLen() {
 		posQM := bytealg.IndexAt(vec.Src(), bQM, offset)
 		posHash := bytealg.IndexAt(vec.Src(), bHash, offset)
+		if posQM >= 0 && posHash >= 0 && posQM > posHash {
+			posQM = posHash
+		}
 		if posQM < 0 {
 			if posHash >= 0 {
 				posQM = posHash

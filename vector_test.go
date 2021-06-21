@@ -118,6 +118,10 @@ var (
 			"http://user@www.example.com/",
 			testTarget{username: "user", host: "www.example.com"},
 		},
+		{
+			"https://www.msn.com/ru-ru/lifestyle/travel/на-фото-памятные-достопримечательности-из-разных-уголков-планеты/ss-AAGnFe0#image=4?ocid=ems.msn.dl.090919.TowerOfPisaItaly",
+			testTarget{hash: "#image=4?ocid=ems.msn.dl.090919.TowerOfPisaItaly"},
+		},
 	}
 	url0 = []byte("https://john_ruth:hangman17@99.99.99.99:3306/foo/bar?that\\'s#all, folks")
 
