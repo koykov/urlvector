@@ -232,10 +232,9 @@ func (vec *Vector) queryOrigin() *vector.Node {
 				vec.BufAppendStr("&")
 				limit++
 			}
-			key := node.KeyString()
-			vec.BufAppendStr(key)
+			key := vecEscape(vec, node.KeyBytes(), modeQuery)
 			vec.BufAppendStr("=")
-			val := vecEscape(vec, node.RawBytes(), modeQuery)
+			val := vecEscape(vec, node.Bytes(), modeQuery)
 			limit += len(key) + len(val) + 1
 		})
 		vec.SetBit(flagBufMod, true)
