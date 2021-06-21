@@ -4,22 +4,22 @@ package urlvector
 //
 // Uses built-in buffer.
 func (vec *Vector) QueryEscape(p []byte) []byte {
-	return queryEscape(vec, p)
+	return vecEscape(vec, p, modeQuery)
 }
 
 // Alias of QueryUnescape().
 func (vec *Vector) QueryUnescape(p []byte) []byte {
-	return queryUnescape(p)
+	return vecUnescape(vec, p, modeQuery)
 }
 
 // Alias of PathEscape().
 //
 // Uses built-in buffer.
 func (vec *Vector) PathEscape(p []byte) []byte {
-	return pathEscape(vec, p)
+	return vecEscape(vec, p, modePath)
 }
 
 // Alias of PathUnescape().
 func (vec *Vector) PathUnescape(p []byte) []byte {
-	return pathUnescape(p)
+	return vecUnescape(vec, p, modePath)
 }

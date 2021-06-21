@@ -14,7 +14,7 @@ func (h *URLHelper) Indirect(p *vector.Byteptr) []byte {
 	b := p.RawBytes()
 	if p.CheckBit(flagEscape) {
 		p.SetBit(flagEscape, false)
-		b = queryUnescape(b)
+		b = unescape(b)
 		p.SetLen(len(b))
 	}
 	return b
