@@ -65,6 +65,30 @@ func (vec *Vector) ParseCopyStr(s string) error {
 
 // Bytes reassembles the vector into a valid URL bytes array.
 func (vec *Vector) Bytes() []byte {
+	return vec.bytes(false)
+}
+
+// String reassembles the vector into a valid URL string.
+func (vec *Vector) String() string {
+	return fastconv.B2S(vec.Bytes())
+}
+
+// Escaped version of Bytes().
+//
+// In addition, escapes host and hash part.
+func (vec *Vector) BytesEscaped() []byte {
+	return vec.bytes(true)
+}
+
+// Escaped version of String().
+//
+// In addition, escapes host and hash part.
+func (vec *Vector) StringEscaped() string {
+	return fastconv.B2S(vec.BytesEscaped())
+}
+
+// Internal marshaller.
+func (vec *Vector) bytes(esc bool) []byte {
 	// Bytes uses internal buffer as destination array to assemble the URL. So we need to save current length of the
 	// buffer and use it further as offset.
 	offset := vec.BufLen()
@@ -97,7 +121,11 @@ func (vec *Vector) Bytes() []byte {
 		if path[0] != '/' {
 			vec.BufAppend(bSlash)
 		}
-		vec.BufAppend(path)
+		if esc {
+			escape(vec, path)
+		} else {
+			vec.BufAppend(path)
+		}
 	}
 
 	if query := vec.QueryBytes(); len(query) > 0 {
@@ -111,15 +139,14 @@ func (vec *Vector) Bytes() []byte {
 		if hash[0] != '#' {
 			vec.BufAppend(bHash)
 		}
-		vec.BufAppend(hash)
+		if esc {
+			escape(vec, hash)
+		} else {
+			vec.BufAppend(hash)
+		}
 	}
 
 	return vec.Buf()[offset:]
-}
-
-// String reassembles the vector into a valid URL string.
-func (vec *Vector) String() string {
-	return fastconv.B2S(vec.Bytes())
 }
 
 // Get scheme node.
