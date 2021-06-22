@@ -251,7 +251,9 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 			}
 		}
 		path.Key().Init(bKeys, offsetPath, lenPath)
+		val := vec.Src()[offset:posQM]
 		path.Value().Init(vec.Src(), offset, posQM-offset)
+		path.Value().SetBit(flagEscape, bytealg.IndexByteAtLR(val, '%', 0) >= 0)
 		offset = posQM
 	}
 
