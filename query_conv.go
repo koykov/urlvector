@@ -72,7 +72,7 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 		case modePath:
 			allow = allow || p[i] == '/'
 		case modeQuery:
-			allow = allow || p[i] == '?'
+			allow = allow && p[i] != '?'
 		case modeHash:
 			allow = allow || p[i] == '#' || p[i] == '?' || p[i] == '=' || p[i] == '!' || p[i] == '(' || p[i] == ')' || p[i] == '*'
 		}
