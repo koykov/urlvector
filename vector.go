@@ -200,7 +200,7 @@ func (vec *Vector) Query() *vector.Node {
 	query := vec.getByIdx(idxQuery)
 	if !vec.CheckBit(flagQueryParsed) {
 		vec.SetBit(flagQueryParsed, true)
-		vec.parseQueryParams(query)
+		vec.parseQueryParams1(query)
 	}
 	return query
 }
