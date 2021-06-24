@@ -253,7 +253,7 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 		path.Key().Init(bKeys, offsetPath, lenPath)
 		val := vec.Src()[offset:posQM]
 		path.Value().Init(vec.Src(), offset, posQM-offset)
-		path.Value().SetBit(flagEscape, bytealg.IndexByteAtLR(val, '%', 0) >= 0)
+		path.Value().SetBit(flagEscape, indexByteAt(val, '%', 0) >= 0)
 		offset = posQM
 	}
 
@@ -308,12 +308,12 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	for {
 		kv, k, v = nil, nil, nil
 
-		i := bytealg.IndexByteAtLR(origin, '&', offset)
+		i := indexByteAt(origin, '&', offset)
 		if i < 0 {
 			i = len(origin)
 		}
 		kv = origin[offset:i]
-		j := bytealg.IndexByteAtLR(kv, '=', 0)
+		j := indexByteAt(kv, '=', 0)
 		if j < 0 {
 			k = kv
 		} else {
@@ -335,7 +335,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			node, idx = vec.GetChildWT(root, 3, vector.TypeStr)
 			if len(v) > 0 {
 				node.Value().Init(origin, offset+len(k)+1, len(v))
-				fesc := bytealg.IndexByteAtLR(v, '%', 0) >= 0 || bytealg.IndexByteAtLR(v, '+', 0) >= 0
+				fesc := indexByteAt(v, '%', 0) >= 0 || indexByteAt(v, '+', 0) >= 0
 				node.Value().SetBit(flagEscape, fesc)
 			}
 			vec.putNode(idx, node)
@@ -345,7 +345,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			node.Key().Init(origin, offset, len(k))
 			if len(v) > 0 {
 				node.Value().Init(origin, offset+len(k)+1, len(v))
-				fesc := bytealg.IndexByteAtLR(v, '%', 0) >= 0 || bytealg.IndexByteAtLR(v, '+', 0) >= 0
+				fesc := indexByteAt(v, '%', 0) >= 0 || indexByteAt(v, '+', 0) >= 0
 				node.Value().SetBit(flagEscape, fesc)
 			}
 			vec.putNode(idx, node)
@@ -378,4 +378,21 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func indexByteAt(p []byte, b byte, at int) int {
+	if at < 0 || at >= len(p) {
+		return -1
+	}
+
+	i, l := at, len(p)
+loop:
+	if p[i] == b {
+		return i
+	}
+	i++
+	if i < l {
+		goto loop
+	}
+	return -1
 }
