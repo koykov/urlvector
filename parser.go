@@ -385,14 +385,8 @@ func indexByteAt(p []byte, b byte, at int) int {
 		return -1
 	}
 
-	i, l := at, len(p)
-loop:
-	if p[i] == b {
-		return i
-	}
-	i++
-	if i < l {
-		goto loop
+	if i := bytes.IndexByte(p[at:], b); i >= 0 {
+		return i + at
 	}
 	return -1
 }
