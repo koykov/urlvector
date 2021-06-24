@@ -194,6 +194,8 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 	if posSl < 0 {
 		if posBSl := bytealg.IndexAt(vec.Src(), bBSlash, offset); posBSl >= 0 {
 			posSl = posBSl
+		} else if posQM := bytealg.IndexAt(vec.Src(), bQM, offset); posQM >= 0 {
+			posSl = posQM
 		} else {
 			posSl = vec.SrcLen()
 		}
