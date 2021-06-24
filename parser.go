@@ -334,9 +334,8 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			}
 			node, idx = vec.GetChildWT(root, 3, vector.TypeStr)
 			if len(v) > 0 {
+				v = unescape(v)
 				node.Value().Init(origin, offset+len(k)+1, len(v))
-				fesc := indexByteAt(v, '%', 0) >= 0 || indexByteAt(v, '+', 0) >= 0
-				node.Value().SetBit(flagEscape, fesc)
 			}
 			vec.putNode(idx, node)
 			vec.PutNode(root.Index(), root)
@@ -344,9 +343,8 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
 			node.Key().Init(origin, offset, len(k))
 			if len(v) > 0 {
+				v = unescape(v)
 				node.Value().Init(origin, offset+len(k)+1, len(v))
-				fesc := indexByteAt(v, '%', 0) >= 0 || indexByteAt(v, '+', 0) >= 0
-				node.Value().SetBit(flagEscape, fesc)
 			}
 			vec.putNode(idx, node)
 		}
