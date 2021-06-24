@@ -1,6 +1,8 @@
 package urlvector
 
 import (
+	"sort"
+
 	"github.com/koykov/fastconv"
 	"github.com/koykov/vector"
 )
@@ -211,7 +213,9 @@ func (vec *Vector) QuerySort() *Vector {
 	if !vec.CheckBit(flagQuerySorted) {
 		vec.SetBit(flagQuerySorted, true)
 		children := query.Children()
-		quickSort(children, 0, len(children)-1)
+		nodes := nodes(children)
+		sort.Sort(&nodes)
+		// quickSort(children, 0, len(children)-1)
 		vec.SetBit(flagQueryMod, true)
 	}
 	return vec
