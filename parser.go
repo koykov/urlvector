@@ -255,7 +255,7 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 		path.Key().Init(bKeys, offsetPath, lenPath)
 		val := vec.Src()[offset:posQM]
 		path.Value().Init(vec.Src(), offset, posQM-offset)
-		path.Value().SetBit(flagEscape, indexByteAt(val, '%', 0) >= 0)
+		path.Value().SetBit(flagEscape, bytealg.IndexByteAtLR(val, '%', 0) >= 0)
 		offset = posQM
 	}
 
@@ -310,12 +310,12 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	for {
 		kv, k, v = nil, nil, nil
 
-		i := indexByteAt(origin, '&', offset)
+		i := bytealg.IndexByteAtLR(origin, '&', offset)
 		if i < 0 {
 			i = len(origin)
 		}
 		kv = origin[offset:i]
-		j := indexByteAt(kv, '=', 0)
+		j := bytealg.IndexByteAtLR(kv, '=', 0)
 		if j < 0 {
 			k = kv
 		} else {
@@ -378,15 +378,4 @@ func max(a, b int) int {
 		return a
 	}
 	return b
-}
-
-func indexByteAt(p []byte, b byte, at int) int {
-	if at < 0 || at >= len(p) {
-		return -1
-	}
-
-	if i := bytes.IndexByte(p[at:], b); i >= 0 {
-		return i + at
-	}
-	return -1
 }
