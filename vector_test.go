@@ -23,113 +23,113 @@ type testTargets struct {
 
 var (
 	cases = []testTargets{
-		// {
-		// 	"",
-		// 	testTarget{err: vector.ErrEmptySrc, errOff: 0},
-		// },
-		// {
-		// 	"/foo",
-		// 	testTarget{path: "/foo"},
-		// },
-		// {
-		// 	"http://example.com",
-		// 	testTarget{scheme: "http", host: "example.com", hostname: "example.com"},
-		// },
-		// {
-		// 	"//foo/bar",
-		// 	testTarget{slashes: true, host: "foo", hostname: "foo", path: "/bar"},
-		// },
-		// {
-		// 	"foo\\nbar\\rbaz\\u2028qux\\u2029",
-		// 	testTarget{err: vector.ErrUnparsedTail, errOff: 0},
-		// },
-		// {
-		// 	" javascript://foo",
-		// 	testTarget{scheme: "javascript", host: "foo"},
-		// },
-		// {
-		// 	"http://google.com/?foo=bar",
-		// 	testTarget{scheme: "http", host: "google.com", query: "?foo=bar"},
-		// },
-		// {
-		// 	"http://google.com/?lolcakes",
-		// 	testTarget{scheme: "http", host: "google.com", query: "?lolcakes"},
-		// },
-		// {
-		// 	"blob:https://gist.github.com/3f272586-6dac-4e29-92d0-f674f2dde618",
-		// 	testTarget{scheme: "https", host: "gist.github.com", path: "/3f272586-6dac-4e29-92d0-f674f2dde618"},
-		// },
-		// {
-		// 	"https://www.mozilla.org/en-US/firefox/34.0/whatsnew/?oldversion=33.1",
-		// 	testTarget{scheme: "https", host: "www.mozilla.org", path: "/en-US/firefox/34.0/whatsnew/", query: "?oldversion=33.1"},
-		// },
-		// {
-		// 	"http://example.com:80",
-		// 	testTarget{host: "example.com:80"},
-		// },
-		// {
-		// 	"http://example.com:80/",
-		// 	testTarget{host: "example.com:80", path: "/"},
-		// },
-		// {
-		// 	"http://x.com/path?that\\'s#all, folks",
-		// 	testTarget{host: "x.com", path: "/path", query: "?that\\'s", hash: "#all, folks"},
-		// },
-		// {
-		// 	"http://google.com:80\\\\@yahoo.com/#what\\\\is going on",
-		// 	testTarget{username: "google.com", password: "80\\\\", host: "yahoo.com", hash: "#what\\\\is going on"},
-		// },
-		// {
-		// 	"http://yolo.com\\\\what-is-up.com",
-		// 	testTarget{path: "\\\\what-is-up.com"},
-		// },
-		// {
-		// 	"HTTP://example.com",
-		// 	testTarget{scheme: "HTTP"}, // fixme must be "http"!
-		// },
-		// {
-		// 	"google.com/foo",
-		// 	testTarget{scheme: "", host: "google.com", path: "/foo"},
-		// },
-		// {
-		// 	"http://[1080:0:0:0:8:800:200C:417A]:61616/foo/bar?q=z",
-		// 	testTarget{host: "[1080:0:0:0:8:800:200C:417A]:61616", hostname: "[1080:0:0:0:8:800:200C:417A]", port: 61616},
-		// },
-		// {
-		// 	"http://user:password@[3ffe:2a00:100:7031::1]:8080/",
-		// 	testTarget{username: "user", password: "password", hostname: "[3ffe:2a00:100:7031::1]", port: 8080},
-		// },
-		// {
-		// 	"http://222.148.142.13:61616/foo/bar?q=z",
-		// 	testTarget{hostname: "222.148.142.13", port: 61616, path: "/foo/bar", query: "?q=z"},
-		// },
-		// {
-		// 	"HTTP://USER:PASS@EXAMPLE.COM",
-		// 	testTarget{
-		// 		scheme:   "HTTP", // fixme must be "http"!
-		// 		username: "USER", password: "PASS", host: "EXAMPLE.COM",
-		// 	},
-		// },
-		// {
-		// 	"http://mt0.google.com/vt/lyrs=m@114&hl=en&src=api&x=2&y=2&z=3&s=",
-		// 	testTarget{path: "/vt/lyrs=m@114&hl=en&src=api&x=2&y=2&z=3&s="},
-		// },
-		// {
-		// 	"http://user@www.example.com/",
-		// 	testTarget{username: "user", host: "www.example.com"},
-		// },
-		// {
-		// 	"https://www.msn.com/ru-ru/lifestyle/travel/на-фото-памятные-достопримечательности-из-разных-уголков-планеты/ss-AAGnFe0#image=4?ocid=ems.msn.dl.090919.TowerOfPisaItaly",
-		// 	testTarget{hash: "#image=4?ocid=ems.msn.dl.090919.TowerOfPisaItaly"},
-		// },
-		// {
-		// 	"https://lamimyde.pro/bB3.VC0DPE2_lGjHPIXJB-zLJMmN9O0_PQUR5SETR-TVJWNXRYE_Va5bTcVdN-RfegEh5iq_SkTlBmNna-mpMqxrTsn_puVvMwUxp-FzbAFBVCK_RE0FpG5HY-jJJKGLaM1_lOtPRQnRV-aTQU1VFWr_SYkZRaKba-ldpeXfUgT_BiOjVk0l0-0nWoWppqC_as0t1uUvZ-GxxyPzRAG_dC3DTEkFR-JHMIVJpKt_WMmN1ONPR-ER5SpTTUX_pWRXeYEZ9-XbUcTdAem_cgnhJipjZ-Dl0mznYo2_Mq3rZsWtQ-zvMwjxUyx_NAGBYC2DZ-DFEG3HMIj_UK3LOMDNg-5PMQDRlSj_NUDVFWiXY-zZUa2bNcy_Zeyfcg3hJ-jjPkXlNmj_complqwrd-CtZu2vdwD_0yxzNAjBI-0DMEjFcG1_NIzJUK1LL-TNVOkPZQG_YS1TYUTVV-hXZYWZUa5_NczdgexfZ-WhRimjMkz_FmjnNoWpJ-krMsTtQu5_ZwWxIy5zY-TBlCjD?bd_vs=1.0.2&bd_t0=1624275754931&bd_a0=a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32,a33,a34,a35,a36,a37,a38,a39,a40,a41,a42,a43,a44,a45,a46,a47,a48,a49,a50,a51,a52,a53,a54,a55,a56,a57,sm0&bd_a1=59&bd_n0=Mozilla/5.0 (Linux; Android 9; SAMSUNG SM-G950F/G950FXXUCDUD1) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.0 Chrome/87.0.4280.141 Mobile Safari/537.36&bd_n1=[\\\"it-IT\\\",\\\"it\\\",\\\"en-US\\\",\\\"en\\\"]&bd_n2=8&bd_n3=20030107&bd_n4=Google Inc.&bd_o1=false&bd_o4=&bd_o5=false&sseq=3&dseq=3&ce=lnk",
-		// 	testTarget{
-		// 		host:  "lamimyde.pro",
-		// 		path:  "/bB3.VC0DPE2_lGjHPIXJB-zLJMmN9O0_PQUR5SETR-TVJWNXRYE_Va5bTcVdN-RfegEh5iq_SkTlBmNna-mpMqxrTsn_puVvMwUxp-FzbAFBVCK_RE0FpG5HY-jJJKGLaM1_lOtPRQnRV-aTQU1VFWr_SYkZRaKba-ldpeXfUgT_BiOjVk0l0-0nWoWppqC_as0t1uUvZ-GxxyPzRAG_dC3DTEkFR-JHMIVJpKt_WMmN1ONPR-ER5SpTTUX_pWRXeYEZ9-XbUcTdAem_cgnhJipjZ-Dl0mznYo2_Mq3rZsWtQ-zvMwjxUyx_NAGBYC2DZ-DFEG3HMIj_UK3LOMDNg-5PMQDRlSj_NUDVFWiXY-zZUa2bNcy_Zeyfcg3hJ-jjPkXlNmj_complqwrd-CtZu2vdwD_0yxzNAjBI-0DMEjFcG1_NIzJUK1LL-TNVOkPZQG_YS1TYUTVV-hXZYWZUa5_NczdgexfZ-WhRimjMkz_FmjnNoWpJ-krMsTtQu5_ZwWxIy5zY-TBlCjD",
-		// 		query: "?bd_vs=1.0.2&bd_t0=1624275754931&bd_a0=a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32,a33,a34,a35,a36,a37,a38,a39,a40,a41,a42,a43,a44,a45,a46,a47,a48,a49,a50,a51,a52,a53,a54,a55,a56,a57,sm0&bd_a1=59&bd_n0=Mozilla/5.0 (Linux; Android 9; SAMSUNG SM-G950F/G950FXXUCDUD1) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.0 Chrome/87.0.4280.141 Mobile Safari/537.36&bd_n1=[\\\"it-IT\\\",\\\"it\\\",\\\"en-US\\\",\\\"en\\\"]&bd_n2=8&bd_n3=20030107&bd_n4=Google Inc.&bd_o1=false&bd_o4=&bd_o5=false&sseq=3&dseq=3&ce=lnk",
-		// 	},
-		// },
+		{
+			"",
+			testTarget{err: vector.ErrEmptySrc, errOff: 0},
+		},
+		{
+			"/foo",
+			testTarget{path: "/foo"},
+		},
+		{
+			"http://example.com",
+			testTarget{scheme: "http", host: "example.com", hostname: "example.com"},
+		},
+		{
+			"//foo/bar",
+			testTarget{slashes: true, host: "foo", hostname: "foo", path: "/bar"},
+		},
+		{
+			"foo\\nbar\\rbaz\\u2028qux\\u2029",
+			testTarget{err: vector.ErrUnparsedTail, errOff: 0},
+		},
+		{
+			" javascript://foo",
+			testTarget{scheme: "javascript", host: "foo"},
+		},
+		{
+			"http://google.com/?foo=bar",
+			testTarget{scheme: "http", host: "google.com", query: "?foo=bar"},
+		},
+		{
+			"http://google.com/?lolcakes",
+			testTarget{scheme: "http", host: "google.com", query: "?lolcakes"},
+		},
+		{
+			"blob:https://gist.github.com/3f272586-6dac-4e29-92d0-f674f2dde618",
+			testTarget{scheme: "https", host: "gist.github.com", path: "/3f272586-6dac-4e29-92d0-f674f2dde618"},
+		},
+		{
+			"https://www.mozilla.org/en-US/firefox/34.0/whatsnew/?oldversion=33.1",
+			testTarget{scheme: "https", host: "www.mozilla.org", path: "/en-US/firefox/34.0/whatsnew/", query: "?oldversion=33.1"},
+		},
+		{
+			"http://example.com:80",
+			testTarget{host: "example.com:80"},
+		},
+		{
+			"http://example.com:80/",
+			testTarget{host: "example.com:80", path: "/"},
+		},
+		{
+			"http://x.com/path?that\\'s#all, folks",
+			testTarget{host: "x.com", path: "/path", query: "?that\\'s", hash: "#all, folks"},
+		},
+		{
+			"http://google.com:80\\\\@yahoo.com/#what\\\\is going on",
+			testTarget{username: "google.com", password: "80\\\\", host: "yahoo.com", hash: "#what\\\\is going on"},
+		},
+		{
+			"http://yolo.com\\\\what-is-up.com",
+			testTarget{path: "\\\\what-is-up.com"},
+		},
+		{
+			"HTTP://example.com",
+			testTarget{scheme: "HTTP"}, // fixme must be "http"!
+		},
+		{
+			"google.com/foo",
+			testTarget{scheme: "", host: "google.com", path: "/foo"},
+		},
+		{
+			"http://[1080:0:0:0:8:800:200C:417A]:61616/foo/bar?q=z",
+			testTarget{host: "[1080:0:0:0:8:800:200C:417A]:61616", hostname: "[1080:0:0:0:8:800:200C:417A]", port: 61616},
+		},
+		{
+			"http://user:password@[3ffe:2a00:100:7031::1]:8080/",
+			testTarget{username: "user", password: "password", hostname: "[3ffe:2a00:100:7031::1]", port: 8080},
+		},
+		{
+			"http://222.148.142.13:61616/foo/bar?q=z",
+			testTarget{hostname: "222.148.142.13", port: 61616, path: "/foo/bar", query: "?q=z"},
+		},
+		{
+			"HTTP://USER:PASS@EXAMPLE.COM",
+			testTarget{
+				scheme:   "HTTP", // fixme must be "http"!
+				username: "USER", password: "PASS", host: "EXAMPLE.COM",
+			},
+		},
+		{
+			"http://mt0.google.com/vt/lyrs=m@114&hl=en&src=api&x=2&y=2&z=3&s=",
+			testTarget{path: "/vt/lyrs=m@114&hl=en&src=api&x=2&y=2&z=3&s="},
+		},
+		{
+			"http://user@www.example.com/",
+			testTarget{username: "user", host: "www.example.com"},
+		},
+		{
+			"https://www.msn.com/ru-ru/lifestyle/travel/на-фото-памятные-достопримечательности-из-разных-уголков-планеты/ss-AAGnFe0#image=4?ocid=ems.msn.dl.090919.TowerOfPisaItaly",
+			testTarget{hash: "#image=4?ocid=ems.msn.dl.090919.TowerOfPisaItaly"},
+		},
+		{
+			"https://lamimyde.pro/bB3.VC0DPE2_lGjHPIXJB-zLJMmN9O0_PQUR5SETR-TVJWNXRYE_Va5bTcVdN-RfegEh5iq_SkTlBmNna-mpMqxrTsn_puVvMwUxp-FzbAFBVCK_RE0FpG5HY-jJJKGLaM1_lOtPRQnRV-aTQU1VFWr_SYkZRaKba-ldpeXfUgT_BiOjVk0l0-0nWoWppqC_as0t1uUvZ-GxxyPzRAG_dC3DTEkFR-JHMIVJpKt_WMmN1ONPR-ER5SpTTUX_pWRXeYEZ9-XbUcTdAem_cgnhJipjZ-Dl0mznYo2_Mq3rZsWtQ-zvMwjxUyx_NAGBYC2DZ-DFEG3HMIj_UK3LOMDNg-5PMQDRlSj_NUDVFWiXY-zZUa2bNcy_Zeyfcg3hJ-jjPkXlNmj_complqwrd-CtZu2vdwD_0yxzNAjBI-0DMEjFcG1_NIzJUK1LL-TNVOkPZQG_YS1TYUTVV-hXZYWZUa5_NczdgexfZ-WhRimjMkz_FmjnNoWpJ-krMsTtQu5_ZwWxIy5zY-TBlCjD?bd_vs=1.0.2&bd_t0=1624275754931&bd_a0=a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32,a33,a34,a35,a36,a37,a38,a39,a40,a41,a42,a43,a44,a45,a46,a47,a48,a49,a50,a51,a52,a53,a54,a55,a56,a57,sm0&bd_a1=59&bd_n0=Mozilla/5.0 (Linux; Android 9; SAMSUNG SM-G950F/G950FXXUCDUD1) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.0 Chrome/87.0.4280.141 Mobile Safari/537.36&bd_n1=[\\\"it-IT\\\",\\\"it\\\",\\\"en-US\\\",\\\"en\\\"]&bd_n2=8&bd_n3=20030107&bd_n4=Google Inc.&bd_o1=false&bd_o4=&bd_o5=false&sseq=3&dseq=3&ce=lnk",
+			testTarget{
+				host:  "lamimyde.pro",
+				path:  "/bB3.VC0DPE2_lGjHPIXJB-zLJMmN9O0_PQUR5SETR-TVJWNXRYE_Va5bTcVdN-RfegEh5iq_SkTlBmNna-mpMqxrTsn_puVvMwUxp-FzbAFBVCK_RE0FpG5HY-jJJKGLaM1_lOtPRQnRV-aTQU1VFWr_SYkZRaKba-ldpeXfUgT_BiOjVk0l0-0nWoWppqC_as0t1uUvZ-GxxyPzRAG_dC3DTEkFR-JHMIVJpKt_WMmN1ONPR-ER5SpTTUX_pWRXeYEZ9-XbUcTdAem_cgnhJipjZ-Dl0mznYo2_Mq3rZsWtQ-zvMwjxUyx_NAGBYC2DZ-DFEG3HMIj_UK3LOMDNg-5PMQDRlSj_NUDVFWiXY-zZUa2bNcy_Zeyfcg3hJ-jjPkXlNmj_complqwrd-CtZu2vdwD_0yxzNAjBI-0DMEjFcG1_NIzJUK1LL-TNVOkPZQG_YS1TYUTVV-hXZYWZUa5_NczdgexfZ-WhRimjMkz_FmjnNoWpJ-krMsTtQu5_ZwWxIy5zY-TBlCjD",
+				query: "?bd_vs=1.0.2&bd_t0=1624275754931&bd_a0=a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32,a33,a34,a35,a36,a37,a38,a39,a40,a41,a42,a43,a44,a45,a46,a47,a48,a49,a50,a51,a52,a53,a54,a55,a56,a57,sm0&bd_a1=59&bd_n0=Mozilla/5.0 (Linux; Android 9; SAMSUNG SM-G950F/G950FXXUCDUD1) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.0 Chrome/87.0.4280.141 Mobile Safari/537.36&bd_n1=[\\\"it-IT\\\",\\\"it\\\",\\\"en-US\\\",\\\"en\\\"]&bd_n2=8&bd_n3=20030107&bd_n4=Google Inc.&bd_o1=false&bd_o4=&bd_o5=false&sseq=3&dseq=3&ce=lnk",
+			},
+		},
 		{
 			"http://sia.ru?section=484&action=show_news&id=414088",
 			testTarget{
