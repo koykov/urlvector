@@ -1,6 +1,9 @@
 package urlvector
 
-import "testing"
+import (
+	"strconv"
+	"testing"
+)
 
 func TestPublicSuffixDB(t *testing.T) {
 	type stage struct {
@@ -56,4 +59,36 @@ func TestPublicSuffixDB(t *testing.T) {
 	t.Run("fetch full", func(t *testing.T) {
 		fetchFn(t, "https://raw.githubusercontent.com/koykov/urlvector/master/testdata/full.psdb", full)
 	})
+}
+
+func BenchmarkPublicSuffixDB(b *testing.B) {
+	var (
+		psdb PublicSuffixDB
+		err  error
+	)
+	if err = psdb.Load("testdata/full.psdb"); err != nil {
+		b.Error(err)
+		return
+	}
+
+	type stage struct {
+		hostname, ps string
+		pos          int
+	}
+	stages := []stage{
+		// {hostname: "go.dev", ps: "dev", pos: 3},
+		// {hostname: "verylongverylongverylongverylongverylongverylonghostname.ipa.xyz", ps: "xyz", pos: 61},
+		{hostname: "www.adobe.xyz", ps: "xyz", pos: 10},
+	}
+	for i, s := range stages {
+		b.Run(strconv.Itoa(i), func(b *testing.B) {
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				ps, pos := psdb.GetStrWP(s.hostname)
+				if ps != s.ps || pos != s.pos {
+					b.Errorf("ps get fail: need '%s'/%d, got '%s'/%d", s.ps, s.pos, ps, pos)
+				}
+			}
+		})
+	}
 }
