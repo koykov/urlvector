@@ -76,8 +76,8 @@ func BenchmarkPublicSuffixDB(b *testing.B) {
 		pos          int
 	}
 	stages := []stage{
-		// {hostname: "go.dev", ps: "dev", pos: 3},
-		// {hostname: "verylongverylongverylongverylongverylongverylonghostname.ipa.xyz", ps: "xyz", pos: 61},
+		{hostname: "go.dev", ps: "dev", pos: 3},
+		{hostname: "verylongverylongverylongverylongverylongverylonghostname.fhv.se", ps: "fhv.se", pos: 57},
 		{hostname: "www.adobe.xyz", ps: "xyz", pos: 10},
 	}
 	for i, s := range stages {

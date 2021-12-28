@@ -113,7 +113,7 @@ func (m PublicSuffixDB) Get(hostname []byte) (ps []byte) {
 
 func (m PublicSuffixDB) GetWP(hostname []byte) ([]byte, int) {
 	hl := len(hostname)
-	if hl < 2 {
+	if hl < 2 || m.idxl == 0 {
 		return nil, -1
 	}
 	var (
