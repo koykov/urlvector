@@ -16,6 +16,7 @@ const (
 
 type PublicSuffixDB struct {
 	idx    []pse
+	idxl   int
 	buf, r []byte
 }
 
@@ -38,6 +39,9 @@ func (m *PublicSuffixDB) Load(dbFile string) (err error) {
 		}
 		m.Add(line)
 	}
+	if len(m.r) > 0 {
+		m.add(m.r)
+	}
 	err = scan.Err()
 
 	return
@@ -57,6 +61,9 @@ func (m *PublicSuffixDB) Fetch(dbURL string) (err error) {
 			continue
 		}
 		m.Add(line)
+	}
+	if len(m.r) > 0 {
+		m.add(m.r)
 	}
 	err = scan.Err()
 
@@ -85,22 +92,130 @@ func (m *PublicSuffixDB) Add(ps []byte) {
 	return
 }
 
+func (m *PublicSuffixDB) AddStr(ps string) {
+	m.Add(fastconv.S2B(ps))
+}
+
 func (m *PublicSuffixDB) add(ps []byte) {
 	var e pse
 	lo := uint32(len(m.buf))
 	hi := uint32(len(ps)) + lo
 	e.encode(lo, hi)
+	m.idxl++
 	m.idx = append(m.idx, e)
 	m.buf = append(m.buf, ps...)
 }
 
-func (m *PublicSuffixDB) AddStr(ps string) {
-	m.Add(fastconv.S2B(ps))
+func (m PublicSuffixDB) Get(hostname []byte) (ps []byte) {
+	ps, _ = m.GetWP(hostname)
+	return
+}
+
+func (m PublicSuffixDB) GetWP(hostname []byte) ([]byte, int) {
+	hl := len(hostname)
+	if hl < 2 {
+		return nil, -1
+	}
+	var (
+		ps  []byte
+		pos int
+		ok  bool
+	)
+	b := m.idx
+	_ = b[len(b)-1]
+	for len(b) >= 8 {
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[0]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[1]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[2]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[3]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[4]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[5]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[6]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[7]); ok {
+			return ps, pos
+		}
+		b = b[8:]
+	}
+	for len(b) >= 4 {
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[0]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[1]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[2]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[3]); ok {
+			return ps, pos
+		}
+		b = b[4:]
+	}
+	for len(b) >= 2 {
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[0]); ok {
+			return ps, pos
+		}
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[1]); ok {
+			return ps, pos
+		}
+		b = b[2:]
+	}
+	if len(b) == 1 {
+		if ps, pos, ok = m.hostHasPSE(hostname, hl, b[0]); ok {
+			return ps, pos
+		}
+	}
+	return nil, -1
+}
+
+func (m PublicSuffixDB) GetStr(hostname string) (ps string) {
+	ps, _ = m.GetStrWP(hostname)
+	return
+}
+
+func (m PublicSuffixDB) GetStrWP(hostname string) (ps string, pos int) {
+	x, p := m.GetWP(fastconv.S2B(hostname))
+	if p == -1 {
+		return
+	}
+	ps, pos = fastconv.B2S(x), p
+	return
 }
 
 func (m *PublicSuffixDB) Reset() {
+	m.idxl = 0
 	m.idx = m.idx[:0]
 	m.buf = m.buf[:0]
+}
+
+func (m PublicSuffixDB) hostHasPSE(hostname []byte, hl int, e pse) (ps []byte, pos int, ok bool) {
+	pos = -1
+	lo, hi := e.decode()
+	if hi-lo >= uint32(hl) {
+		return
+	}
+	a := m.buf[lo:hi]
+	b := hostname[uint32(hl)-(hi-lo)-1:]
+	if b[0] == '.' && bytes.Equal(a, b[1:]) {
+		ps = b[1:]
+		pos = hl - int(hi-lo)
+		ok = true
+	}
+	return
 }
 
 func psMustSkip(line []byte) bool {
