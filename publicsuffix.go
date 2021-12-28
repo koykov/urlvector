@@ -3,7 +3,6 @@ package urlvector
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -16,8 +15,8 @@ const (
 )
 
 type PublicSuffixDB struct {
-	idx []pse
-	buf []byte
+	idx    []pse
+	buf, r []byte
 }
 
 var (
@@ -68,30 +67,35 @@ func (m *PublicSuffixDB) FetchFull() error {
 	return m.Fetch(fullURL)
 }
 
-var c int
-
-func (m *PublicSuffixDB) Add(ps []byte) (lo, hi uint32) {
+func (m *PublicSuffixDB) Add(ps []byte) {
 	if bytes.Equal(ps[:2], bPrefixAllPS) {
 		ps = ps[2:]
 	}
-	if !bytealg.HasByteLR(ps, '.') && len(ps) < 4 {
-		c++
-		fmt.Println(string(ps), c)
-	}
-	if hi = uint32(len(ps)); hi == 0 {
+	if len(ps) == 0 {
 		return
 	}
-	var e pse
-	lo = uint32(len(m.buf))
-	hi += lo
-	e.encode(lo, hi)
-	m.idx = append(m.idx, e)
-	m.buf = append(m.buf, ps...)
+	if !bytealg.HasByteLR(ps, '.') {
+		if len(m.r) > 0 {
+			m.add(m.r)
+		}
+		m.r = append(m.r[:0], ps...)
+		return
+	}
+	m.add(ps)
 	return
 }
 
-func (m *PublicSuffixDB) AddStr(ps string) (uint32, uint32) {
-	return m.Add(fastconv.S2B(ps))
+func (m *PublicSuffixDB) add(ps []byte) {
+	var e pse
+	lo := uint32(len(m.buf))
+	hi := uint32(len(ps)) + lo
+	e.encode(lo, hi)
+	m.idx = append(m.idx, e)
+	m.buf = append(m.buf, ps...)
+}
+
+func (m *PublicSuffixDB) AddStr(ps string) {
+	m.Add(fastconv.S2B(ps))
 }
 
 func (m *PublicSuffixDB) Reset() {
