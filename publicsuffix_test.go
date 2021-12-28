@@ -79,6 +79,8 @@ func BenchmarkPublicSuffixDB(b *testing.B) {
 		{hostname: "go.dev", ps: "dev", pos: 3},
 		{hostname: "verylongverylongverylongverylongverylongverylonghostname.fhv.se", ps: "fhv.se", pos: 57},
 		{hostname: "www.adobe.xyz", ps: "xyz", pos: 10},
+		{hostname: "foobar.ru", ps: "ru", pos: 7},
+		{hostname: "спб.рф", ps: "рф", pos: 7},
 	}
 	for i, s := range stages {
 		b.Run(strconv.Itoa(i), func(b *testing.B) {
