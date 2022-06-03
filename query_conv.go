@@ -12,6 +12,10 @@ const (
 	hexUp = "0123456789ABCDEF"
 )
 
+var (
+	_, _, _, _ = QueryEscape, QueryUnescape, PathEscape, PathUnescape
+)
+
 // QueryEscape escapes the string so it can be safely placed inside a URL query.
 func QueryEscape(dst, p []byte) []byte {
 	return bufEscape(dst, p, modeQuery)

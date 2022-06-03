@@ -31,12 +31,12 @@ const (
 	flagBufSrc = 9
 )
 
-// Parser object.
+// Vector represents URL parser.
 type Vector struct {
 	vector.Vector
 }
 
-// Make new parser.
+// NewVector makes new parser.
 func NewVector() *Vector {
 	vec := &Vector{}
 	vec.Helper = helper
@@ -48,17 +48,17 @@ func (vec *Vector) Parse(s []byte) error {
 	return vec.parse(s, false)
 }
 
-// Parse source string.
+// ParseStr parses source string.
 func (vec *Vector) ParseStr(s string) error {
 	return vec.parse(fastconv.S2B(s), false)
 }
 
-// Copy source bytes and parse it.
+// ParseCopy copies source bytes and parse it.
 func (vec *Vector) ParseCopy(s []byte) error {
 	return vec.parse(s, true)
 }
 
-// Copy source string and parse it.
+// ParseCopyStr copies source string and parse it.
 func (vec *Vector) ParseCopyStr(s string) error {
 	return vec.parse(fastconv.S2B(s), true)
 }
@@ -73,14 +73,14 @@ func (vec *Vector) String() string {
 	return fastconv.B2S(vec.Bytes())
 }
 
-// Escaped version of Bytes().
+// BytesEscaped returns escaped URL bytes.
 //
 // In addition, escapes host and hash part.
 func (vec *Vector) BytesEscaped() []byte {
 	return vec.bytes(true)
 }
 
-// Escaped version of String().
+// StringEscaped returns escaped URL string.
 //
 // In addition, escapes host and hash part.
 func (vec *Vector) StringEscaped() string {
@@ -149,53 +149,53 @@ func (vec *Vector) bytes(esc bool) []byte {
 	return vec.Buf()[offset:]
 }
 
-// Get scheme node.
+// Scheme returns scheme node.
 func (vec *Vector) Scheme() *vector.Node {
 	return vec.getByIdx(idxScheme)
 }
 
-// Returns true if URL is started with slashes.
+// Slashes indicates if URL is started with slashes.
 func (vec *Vector) Slashes() bool {
 	return vec.getByIdx(idxSlashes).Bool()
 }
 
-// Get auth node (contains both username and password substrings).
+// Auth returns auth node (contains both username and password substrings).
 func (vec *Vector) Auth() *vector.Node {
 	return vec.getByIdx(idxAuth)
 }
 
-// Get username node.
+// Username returns username node.
 func (vec *Vector) Username() *vector.Node {
 	return vec.getByIdx(idxUsername)
 }
 
-// Get password node.
+// Password returns password node.
 func (vec *Vector) Password() *vector.Node {
 	return vec.getByIdx(idxPassword)
 }
 
-// Get host node (contains both hostname/IP and port substrings).
+// Host returns host node (contains both hostname/IP and port substrings).
 func (vec *Vector) Host() *vector.Node {
 	return vec.getByIdx(idxHost)
 }
 
-// Get hostname node (similar to Host(), but excludes port).
+// Hostname returns hostname node (similar to Host(), but excludes port).
 func (vec *Vector) Hostname() *vector.Node {
 	return vec.getByIdx(idxHostname)
 }
 
-// Get port as integer.
+// Port returns port as integer.
 func (vec *Vector) Port() int {
 	i, _ := vec.getByIdx(idxPort).Int()
 	return int(i)
 }
 
-// Get path node.
+// Path returns path node.
 func (vec *Vector) Path() *vector.Node {
 	return vec.getByIdx(idxPath)
 }
 
-// Get query node with origin query params order.
+// Query returns query node with origin query params order.
 func (vec *Vector) Query() *vector.Node {
 	query := vec.getByIdx(idxQuery)
 	if !vec.CheckBit(flagQueryParsed) {
@@ -205,7 +205,7 @@ func (vec *Vector) Query() *vector.Node {
 	return query
 }
 
-// Sort query params an AB order.
+// QuerySort sorts query params an AB order.
 func (vec *Vector) QuerySort() *Vector {
 	query := vec.Query()
 	if !vec.CheckBit(flagQuerySorted) {
@@ -246,7 +246,7 @@ func (vec *Vector) queryOrigin() *vector.Node {
 	return queryOrigin
 }
 
-// Get hash node.
+// Hash returns hash node.
 func (vec *Vector) Hash() *vector.Node {
 	return vec.getByIdx(idxHash)
 }

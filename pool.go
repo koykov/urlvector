@@ -2,13 +2,13 @@ package urlvector
 
 import "sync"
 
-// Vector pool.
+// Pool represents URL vectors pool.
 type Pool struct {
 	p sync.Pool
 }
 
 var (
-	// Default instance of the pool.
+	// P is a default instance of the pool.
 	// Just call urlvector.Acquire() and urlvector.Release().
 	P Pool
 	// Suppress go vet warnings.
@@ -33,12 +33,12 @@ func (p *Pool) Put(vec *Vector) {
 	p.p.Put(vec)
 }
 
-// Get vector from default pool instance.
+// Acquire returns vector from default pool instance.
 func Acquire() *Vector {
 	return P.Get()
 }
 
-// Put vector back to default pool instance.
+// Release puts vector back to default pool instance.
 func Release(vec *Vector) {
 	P.Put(vec)
 }
