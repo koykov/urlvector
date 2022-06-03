@@ -4,13 +4,13 @@ import (
 	"github.com/koykov/vector"
 )
 
-type URLHelper struct{}
+type Helper struct{}
 
 var (
-	urlHelper = &URLHelper{}
+	helper = Helper{}
 )
 
-func (h *URLHelper) Indirect(p *vector.Byteptr) []byte {
+func (h Helper) Indirect(p *vector.Byteptr) []byte {
 	b := p.RawBytes()
 	if p.CheckBit(flagEscape) {
 		p.SetBit(flagEscape, false)

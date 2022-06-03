@@ -39,7 +39,7 @@ type Vector struct {
 // Make new parser.
 func NewVector() *Vector {
 	vec := &Vector{}
-	vec.Helper = urlHelper
+	vec.Helper = helper
 	return vec
 }
 
