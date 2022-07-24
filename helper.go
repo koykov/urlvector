@@ -1,6 +1,8 @@
 package urlvector
 
 import (
+	"io"
+
 	"github.com/koykov/vector"
 )
 
@@ -18,4 +20,8 @@ func (h Helper) Indirect(p *vector.Byteptr) []byte {
 		p.SetLen(len(b))
 	}
 	return b
+}
+
+func (h Helper) Beautify(_ io.Writer, _ *vector.Node) error {
+	return nil
 }
