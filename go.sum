@@ -8,5 +8,5 @@ github.com/koykov/fastconv v0.0.0-20211028200057-f6897ace3bc2 h1:jIlvXIudUQ6ER2y
 github.com/koykov/fastconv v0.0.0-20211028200057-f6897ace3bc2/go.mod h1:JXdtdh0aCcSmxLsVUoYP61lmxpL6dWOXEKxCIR+MlGg=
 github.com/koykov/indirect v0.0.0-20220403200712-f40904459e17 h1:K9ITvibI9twy8SMQzgmJH480JQAHg8lb3UPMZeijr+U=
 github.com/koykov/indirect v0.0.0-20220403200712-f40904459e17/go.mod h1:2qWC0hrIHIexlKaqPA0VWEa0s2V/qxxNJv7XPncnh2I=
-github.com/koykov/vector v0.0.0-20220724202349-d966918d54fb h1:hiX4oak9abZEk5Ja6c4ElD7eqtWwdsfcIbgkAR10lzE=
-github.com/koykov/vector v0.0.0-20220724202349-d966918d54fb/go.mod h1:BjcIDcWZNmy2GxTnNHUmZ4VXKAfJTwqkXWt14pDe8Aw=
+github.com/koykov/vector v0.0.0-20220812201902-76f3cd962b2c h1:kqCPQBOswMSJSdsu60hZCnNR8ef9DCEc5AgjeaxgHJw=
+github.com/koykov/vector v0.0.0-20220812201902-76f3cd962b2c/go.mod h1:BjcIDcWZNmy2GxTnNHUmZ4VXKAfJTwqkXWt14pDe8Aw=
