@@ -12,10 +12,6 @@ const (
 	hexUp = "0123456789ABCDEF"
 )
 
-var (
-	_, _, _, _ = QueryEscape, QueryUnescape, PathEscape, PathUnescape
-)
-
 // QueryEscape escapes the string so it can be safely placed inside a URL query.
 func QueryEscape(dst, p []byte) []byte {
 	return bufEscape(dst, p, modeQuery)
@@ -36,7 +32,7 @@ func PathUnescape(dst, p []byte) []byte {
 	return bufUnescape(dst, p, modePath)
 }
 
-// Unescape byte array using itself as a destination.
+// In-place unescape bytes.
 func unescape(p []byte) []byte {
 	l := len(p)
 	n := len(p)
@@ -63,6 +59,7 @@ func unescape(p []byte) []byte {
 	return p[:n]
 }
 
+// Escape p to dst according mode.
 func bufEscape(dst, p []byte, mode mode) []byte {
 	l := len(p)
 	if l == 0 {
@@ -74,7 +71,7 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 			p[i] == '-' || p[i] == '.' || p[i] == '_'
 		switch mode {
 		case modePath:
-			allow = allow || p[i] == '/'
+			allow = allow || p[i] == '&' || p[i] == '=' || p[i] == '+' || p[i] == ':' || p[i] == '@' || p[i] == '$'
 		case modeQuery:
 			allow = allow && p[i] != '?'
 		case modeHash:
@@ -83,7 +80,12 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 		if allow {
 			dst = append(dst, p[i])
 		} else if p[i] == ' ' {
-			dst = append(dst, '+')
+			switch mode {
+			case modePath:
+				dst = append(dst, "%20"...)
+			default:
+				dst = append(dst, '+')
+			}
 		} else {
 			dst = append(dst, '%')
 			dst = append(dst, hexUp[p[i]>>4])
@@ -93,10 +95,39 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 	return dst
 }
 
+// Unescape p do dst according mode.
 func bufUnescape(dst, p []byte, mode mode) []byte {
-	_, _ = dst, mode
-	dst = unescape(p)
-	return dst
+	_ = mode
+	l := len(p)
+	n := len(p)
+	if l < 3 {
+		dst = append(dst, p...)
+		return dst
+	}
+	_ = p[l-1]
+	for i := 0; i < l; i++ {
+		switch p[i] {
+		case '%':
+			if i+2 < l {
+				x2 := hex[p[i+2]]
+				x1 := hex[p[i+1]]
+				if x1 != 16 || x2 != 16 {
+					dst = append(dst, x1<<4|x2)
+					i += 2
+					n -= 2
+				}
+			}
+		case '+':
+			if mode != modePath {
+				dst = append(dst, ' ')
+			} else {
+				dst = append(dst, '+')
+			}
+		default:
+			dst = append(dst, p[i])
+		}
+	}
+	return dst[:n]
 }
 
 func vecEscape(vec *Vector, p []byte, mode mode) []byte {
