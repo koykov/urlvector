@@ -1,5 +1,10 @@
 package urlvector
 
+import (
+	"reflect"
+	"unsafe"
+)
+
 type mode int
 
 const (
@@ -65,6 +70,7 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 	if l == 0 {
 		return dst
 	}
+	o, sp, n := len(dst), samePtr(dst, p), 0
 	_ = p[l-1]
 	for i := 0; i < l; i++ {
 		allow := p[i] >= 'a' && p[i] <= 'z' || p[i] >= 'A' && p[i] <= 'Z' || p[i] >= '0' && p[i] <= '9' ||
@@ -79,18 +85,26 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 		}
 		if allow {
 			dst = append(dst, p[i])
+			n++
 		} else if p[i] == ' ' {
 			switch mode {
 			case modePath:
 				dst = append(dst, "%20"...)
+				n += 3
 			default:
 				dst = append(dst, '+')
+				n++
 			}
 		} else {
 			dst = append(dst, '%')
 			dst = append(dst, hexUp[p[i]>>4])
 			dst = append(dst, hexUp[p[i]&15])
+			n += 3
 		}
+	}
+	if sp {
+		copy(dst, dst[o:])
+		return dst[:n]
 	}
 	return dst
 }
@@ -98,10 +112,14 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 // Unescape p do dst according mode.
 func bufUnescape(dst, p []byte, mode mode) []byte {
 	_ = mode
-	l := len(p)
-	n := len(p)
+	o, l, sp := len(dst), len(p), samePtr(dst, p)
+	n := l
 	if l < 3 {
 		dst = append(dst, p...)
+		if sp {
+			copy(dst, dst[o:])
+			return dst[:l]
+		}
 		return dst
 	}
 	_ = p[l-1]
@@ -127,6 +145,9 @@ func bufUnescape(dst, p []byte, mode mode) []byte {
 			dst = append(dst, p[i])
 		}
 	}
+	if sp {
+		copy(dst, dst[o:])
+	}
 	return dst[:n]
 }
 
@@ -144,4 +165,11 @@ func vecEscape(vec *Vector, p []byte, mode mode) []byte {
 func vecUnescape(vec *Vector, p []byte, mode mode) []byte {
 	_, _ = vec, mode
 	return unescape(p)
+}
+
+// Check if a and b has the same pointers. Needs for in-place escape/unescape.
+func samePtr(a, b []byte) bool {
+	ah := *(*reflect.SliceHeader)(unsafe.Pointer(&a))
+	bh := *(*reflect.SliceHeader)(unsafe.Pointer(&b))
+	return ah.Data == bh.Data && ah.Len == bh.Len && ah.Cap == bh.Cap
 }
