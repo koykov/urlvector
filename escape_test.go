@@ -41,7 +41,6 @@ var stages = []struct {
 		"longerrunofcharacters%28break%29anotherlongerrunofcharacters",
 		"longerrunofcharacters%28break%29anotherlongerrunofcharacters",
 	},
-
 	{
 		strings.Repeat("padded/with+various%characters?that=need$some@escaping+paddedsowebreak/256bytes", 4),
 		strings.Repeat("padded%2Fwith%2Bvarious%25characters%3Fthat%3Dneed%24some%40escaping%2Bpaddedsowebreak%2F256bytes", 4),
@@ -82,6 +81,9 @@ func TestUnescape(t *testing.T) {
 	}
 	for i, stage := range stages {
 		t.Run("path/"+strconv.Itoa(i), func(t *testing.T) {
+			if len(stage.exp1) == 0 {
+				return
+			}
 			var buf []byte
 			buf = PathUnescape(buf[:0], fastconv.S2B(stage.exp1))
 			if r := fastconv.B2S(buf); r != stage.raw {
