@@ -173,7 +173,7 @@ var (
 	vec = NewVector()
 )
 
-func printErr(t testing.TB, tst *testTargets, args ...interface{}) {
+func printErr(t testing.TB, tst *testTargets, args ...any) {
 	t.Error("\nsrc: "+tst.url+"\n", args)
 }
 
