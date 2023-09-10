@@ -128,11 +128,25 @@ func (vec *Vector) bytes(esc bool) []byte {
 		}
 	}
 
-	if query := vec.QueryBytes(); len(query) > 0 {
-		if query[0] != '?' {
-			vec.BufAppend(bQM)
+	if !vec.CheckBit(flagQueryParsed) {
+		if query := vec.QueryBytes(); len(query) > 0 {
+			if query[0] != '?' {
+				vec.BufAppend(bQM)
+			}
+			vec.BufAppend(query)
 		}
-		vec.BufAppend(query)
+	} else {
+		if query := vec.getByIdx(idxQuery); query.Limit() > 0 {
+			vec.BufAppend(bQM)
+			query.Each(func(idx int, node *vector.Node) {
+				if idx > 0 {
+					vec.BufAppend(bAmp)
+				}
+				vec.BufAppend(node.KeyBytes())
+				vec.BufAppend(bEq)
+				vecEscape(vec, node.Value().Bytes(), modeQuery)
+			})
+		}
 	}
 
 	if hash := vec.HashBytes(); len(hash) > 0 {
@@ -210,8 +224,8 @@ func (vec *Vector) QuerySort() *Vector {
 	query := vec.Query()
 	if !vec.CheckBit(flagQuerySorted) {
 		vec.SetBit(flagQuerySorted, true)
-		children := query.Children()
-		quickSort(children, 0, len(children)-1)
+		children := query.ChildrenIndices()
+		quickSort1(vec, children, 0, len(children)-1)
 		vec.SetBit(flagQueryMod, true)
 	}
 	return vec

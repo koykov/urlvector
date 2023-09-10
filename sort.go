@@ -43,3 +43,33 @@ func quickSort(p []vector.Node, lo, hi int) {
 		quickSort(p, pi+1, hi)
 	}
 }
+
+func pivot1(vec *Vector, p []int, lo, hi int) int {
+	if len(p) == 0 {
+		return 0
+	}
+	pi := vec.getByIdx(p[hi])
+	i := lo - 1
+	_ = p[len(p)-1]
+	for j := lo; j <= hi-1; j++ {
+		pj := vec.getByIdx(p[j])
+		if pj.KeyString() < pi.KeyString() {
+			i++
+			vec.getByIdx(p[i]).SwapWith(pj)
+		}
+	}
+	if i < hi {
+		vec.getByIdx(p[i+1]).SwapWith(pi)
+	}
+	return i + 1
+}
+
+func quickSort1(vec *Vector, p []int, lo, hi int) {
+	if lo < hi {
+		pi := pivot1(vec, p, lo, hi)
+		quickSort1(vec, p, lo, pi-1)
+		quickSort1(vec, p, pi+1, hi)
+	}
+}
+
+var _ = quickSort

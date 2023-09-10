@@ -54,8 +54,10 @@ var (
 	bColon     = []byte(":")
 	bAt        = []byte("@")
 	bQM        = []byte("?")
+	bAmp       = []byte("&")
 	bHash      = []byte("#")
 	bQB        = []byte("[]")
+	bEq        = []byte("=")
 
 	// Keys source array and raw address of it.
 	bKeys = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")

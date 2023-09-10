@@ -3,6 +3,7 @@ package urlvector
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/koykov/vector"
@@ -170,6 +171,9 @@ var (
 	query3repl = []byte("?foo=x&bar=y&a[]=1&a[]=2&a[]=c&b[]=qwe&b[]=rty&z")
 	query3new  = []byte("https://foo:bar@google.com:8080/search?q=keys#results")
 
+	queryRemove       = `https://example.ru/services/context/?q=foobar&utm_source=google_adwords_Poisk&utm_medium=cpc&utm_geo=Москва&utm_campaign=Kontekstnaya_reklama_Moskva_Poisk&arg=qwerty&utm_content=Nastroyka_kontekstnoy_reklami&utm_term=настройка контекстной рекламы&gclid=Cj0KCQjwn_LrBRD4ARIsAFEQFKvL-kzn-g2cbcezy6GTobnpRIGtWQgnzZjR2c06qukAWMaLKm0fG40aAtTlEALw_wc`
+	queryRemoveExpect = `https://example.ru/services/context/?arg=qwerty&gclid=Cj0KCQjwn_LrBRD4ARIsAFEQFKvL-kzn-g2cbcezy6GTobnpRIGtWQgnzZjR2c06qukAWMaLKm0fG40aAtTlEALw_wc&q=foobar`
+
 	vec = NewVector()
 )
 
@@ -274,6 +278,17 @@ func TestVector_ParseQuery(t *testing.T) {
 			}
 		}
 	})
+}
+
+func TestVector_RemoveIf(t *testing.T) {
+	vec.Reset()
+	_ = vec.ParseStr(queryRemove)
+	vec.Query().RemoveIf(func(_ int, node *vector.Node) bool {
+		return strings.HasPrefix(node.KeyString(), "utm")
+	})
+	if vec.QuerySort().String() != queryRemoveExpect {
+		t.FailNow()
+	}
 }
 
 func TestVector_Set(t *testing.T) {
@@ -604,6 +619,21 @@ func BenchmarkVector_QuerySort(b *testing.B) {
 		mod := vec.QuerySort().QueryBytes()
 		if !bytes.Equal(mod, query0sorted) {
 			b.Error("query 0 sort failed", "need", string(query0sorted), "got", string(mod))
+		}
+	}
+}
+
+func BenchmarkVector_RemoveIf(b *testing.B) {
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		vec.Reset()
+		_ = vec.ParseStr(queryRemove)
+		vec.Query().RemoveIf(func(_ int, node *vector.Node) bool {
+			return strings.HasPrefix(node.KeyString(), "utm")
+		})
+		if vec.QuerySort().String() != queryRemoveExpect {
+			b.FailNow()
 		}
 	}
 }
