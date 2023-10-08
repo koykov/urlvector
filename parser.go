@@ -309,6 +309,9 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 		kv, k, v    []byte
 		root, node  *vector.Node
 	)
+	if origin[0] == '&' {
+		offset++
+	}
 	for {
 		kv, k, v = nil, nil, nil
 
