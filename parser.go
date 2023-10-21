@@ -65,6 +65,10 @@ var (
 
 // Main internal parser helper.
 func (vec *Vector) parse(s []byte, copy bool) (err error) {
+	if vec.Helper == nil {
+		vec.Helper = helper
+	}
+
 	s = bytealg.Trim(s, bSpace)
 	// Remove blob: prefix if present.
 	if len(s) >= 5 && bytes.Equal(s[:5], bBlob) {
