@@ -25,3 +25,8 @@ func (h Helper) Indirect(p *vector.Byteptr) []byte {
 func (h Helper) Beautify(_ io.Writer, _ *vector.Node) error {
 	return nil
 }
+
+func (h Helper) Marshal(w io.Writer, node *vector.Node) error {
+	_, err := w.Write(node.Bytes())
+	return err
+}
