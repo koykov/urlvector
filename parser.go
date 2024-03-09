@@ -157,26 +157,30 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 	username, iu := vec.GetChildWT(node, depth, vector.TypeStr)
 	password, ip := vec.GetChildWT(node, depth, vector.TypeStr)
 
-	posCol := bytealg.IndexAt(vec.Src(), bColon, offset)
-	posAt := bytealg.IndexAt(vec.Src(), bAt, max(posCol, offset))
-	if posSl := bytealg.IndexAt(vec.Src(), bSlash, offset); posSl >= 0 && posSl < posAt {
+	src := vec.Src()
+	n := len(src)
+	_ = src[n-1]
+
+	posCol := bytealg.IndexByteAtBytes(src, ':', offset)
+	posAt := bytealg.IndexByteAtBytes(src, '@', max_(posCol, offset))
+	if posSl := bytealg.IndexByteAtBytes(src, '/', offset); posSl >= 0 && posSl < posAt {
 		posAt = -1
 	}
 
 	if posAt > 0 {
 		auth.Key().Init(bKeys, offsetAuth, lenAuth)
-		auth.Value().Init(vec.Src(), offset, posAt-offset)
+		auth.Value().Init(src, offset, posAt-offset)
 
 		if posCol >= 0 {
 			username.Key().Init(bKeys, offsetUsername, lenUsername)
-			username.Value().Init(vec.Src(), offset, posCol-offset)
+			username.Value().Init(src, offset, posCol-offset)
 			offset = posCol + 1
 
 			password.Key().Init(bKeys, offsetPassword, lenPassword)
-			password.Value().Init(vec.Src(), offset, posAt-posCol-1)
+			password.Value().Init(src, offset, posAt-posCol-1)
 		} else {
 			username.Key().Init(bKeys, offsetUsername, lenUsername)
-			username.Value().Init(vec.Src(), offset, posAt-offset)
+			username.Value().Init(src, offset, posAt-offset)
 		}
 		offset = posAt + 1
 	}
@@ -196,38 +200,42 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 	hostname, in := vec.GetChildWT(node, depth, vector.TypeStr)
 	port, ip := vec.GetChildWT(node, depth, vector.TypeNum)
 
-	posSl := bytealg.IndexAt(vec.Src(), bSlash, offset)
+	src := vec.Src()
+	n := len(src)
+	_ = src[n-1]
+
+	posSl := bytealg.IndexByteAtBytes(src, '/', offset)
 	if posSl < 0 {
-		if posBSl := bytealg.IndexAt(vec.Src(), bBSlash, offset); posBSl >= 0 {
+		if posBSl := bytealg.IndexByteAtBytes(src, '\\', offset); posBSl >= 0 {
 			posSl = posBSl
-		} else if posQM := bytealg.IndexAt(vec.Src(), bQM, offset); posQM >= 0 {
+		} else if posQM := bytealg.IndexByteAtBytes(src, '?', offset); posQM >= 0 {
 			posSl = posQM
 		} else {
-			posSl = vec.SrcLen()
+			posSl = n
 		}
 	}
 	posCol := -1
 	i := offset
 loop:
-	i = bytealg.IndexAt(vec.Src(), bColon, i+1)
+	i = bytealg.IndexByteAtBytes(src, ':', i+1)
 	if i >= 0 && i < posSl {
 		posCol = i
 		goto loop
 	}
 
 	host.Key().Init(bKeys, offsetHost, lenHost)
-	host.Value().Init(vec.Src(), offset, posSl-offset)
+	host.Value().Init(src, offset, posSl-offset)
 
 	if posCol >= 0 {
 		hostname.Key().Init(bKeys, offsetHostname, lenHostname)
-		hostname.Value().Init(vec.Src(), offset, posCol-offset)
+		hostname.Value().Init(src, offset, posCol-offset)
 		offset = posCol + 1
 
 		port.Key().Init(bKeys, offsetPort, lenPort)
-		port.Value().Init(vec.Src(), offset, posSl-offset)
+		port.Value().Init(src, offset, posSl-offset)
 	} else {
 		hostname.Key().Init(bKeys, offsetHostname, lenHostname)
-		hostname.Value().Init(vec.Src(), offset, posSl-offset)
+		hostname.Value().Init(src, offset, posSl-offset)
 	}
 
 	vec.putNode(ih, host)
@@ -245,9 +253,13 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 
 	path, i := vec.GetChildWT(node, depth, vector.TypeStr)
 
-	if offset < vec.SrcLen() {
-		posQM := bytealg.IndexAt(vec.Src(), bQM, offset)
-		posHash := bytealg.IndexAt(vec.Src(), bHash, offset)
+	src := vec.Src()
+	n := len(src)
+	_ = src[n-1]
+
+	if offset < n {
+		posQM := bytealg.IndexByteAtBytes(vec.Src(), '?', offset)
+		posHash := bytealg.IndexByteAtBytes(vec.Src(), '#', offset)
 		if posQM >= 0 && posHash >= 0 && posQM > posHash {
 			posQM = posHash
 		}
@@ -255,13 +267,13 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 			if posHash >= 0 {
 				posQM = posHash
 			} else {
-				posQM = vec.SrcLen()
+				posQM = n
 			}
 		}
 		path.Key().Init(bKeys, offsetPath, lenPath)
-		val := vec.Src()[offset:posQM]
-		path.Value().Init(vec.Src(), offset, posQM-offset)
-		path.Value().SetBit(flagEscape, bytealg.IndexByteAtLUR(val, '%', 0) >= 0)
+		val := src[offset:posQM]
+		path.Value().Init(src, offset, posQM-offset)
+		path.Value().SetBit(flagEscape, bytealg.IndexByteAtBytes(val, '%', 0) >= 0)
 		offset = posQM
 	}
 
@@ -281,18 +293,22 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 	hash, ih := vec.GetChildWT(node, depth, vector.TypeStr)
 	query, iq := vec.GetChildWT(node, depth, vector.TypeObj)
 
-	if offset < vec.SrcLen() {
-		posHash := bytealg.IndexAt(vec.Src(), bHash, offset)
+	src := vec.Src()
+	n := len(src)
+	_ = src[n-1]
+
+	if offset < n {
+		posHash := bytealg.IndexByteAtBytes(src, '#', offset)
 		if posHash < 0 {
-			posHash = vec.SrcLen()
+			posHash = n
 		} else {
 			hash.Key().Init(bKeys, offsetHash, lenHash)
-			hash.Value().Init(vec.Src(), posHash, vec.SrcLen()-posHash)
+			hash.Value().Init(src, posHash, n-posHash)
 		}
 		query.Key().Init(bKeys, offsetQuery, lenQuery)
 		queryOrig.Key().Init(bKeys, offsetQueryOrigin, lenQueryOrigin)
-		queryOrig.Value().Init(vec.Src(), offset, posHash-offset)
-		offset = vec.SrcLen()
+		queryOrig.Value().Init(src, offset, posHash-offset)
+		offset = n
 	}
 
 	vec.putNode(iqo, queryOrig)
@@ -319,12 +335,12 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	for {
 		kv, k, v = nil, nil, nil
 
-		i := bytealg.IndexByteAtLUR(origin, '&', offset)
+		i := bytealg.IndexByteAtBytes(origin, '&', offset)
 		if i < 0 {
 			i = len(origin)
 		}
 		kv = origin[offset:i]
-		j := bytealg.IndexByteAtLUR(kv, '=', 0)
+		j := bytealg.IndexByteAtBytes(kv, '=', 0)
 		if j < 0 {
 			k = kv
 		} else {
@@ -383,7 +399,7 @@ func (vec *Vector) ensureFlags(node *vector.Node) {
 }
 
 // Int version of math.Max().
-func max(a, b int) int {
+func max_(a, b int) int {
 	if a > b {
 		return a
 	}
