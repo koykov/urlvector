@@ -48,21 +48,14 @@ func unescape(p []byte) []byte {
 	}
 	_ = p[l-1]
 	off := 0
+	var i int
 	for {
-		i := bytealg.IndexByteAtBytes(p, '+', off)
-		if i == -1 {
-			break
+		if i = bytealg.IndexByteAtBytes(p, '+', off); i != -1 {
+			p[i] = ' '
+			off = i + 1
+			continue
 		}
-		p[i] = ' '
-		off = i + 1
-	}
-	off = 0
-	for {
-		i := bytealg.IndexByteAtBytes(p, '%', off)
-		if i == -1 {
-			break
-		}
-		if i+2 < l {
+		if i = bytealg.IndexByteAtBytes(p, '%', off); i != -1 && i+2 < l {
 			x2 := hex[p[i+2]]
 			x1 := hex[p[i+1]]
 			if x1 != 16 || x2 != 16 {
@@ -70,8 +63,10 @@ func unescape(p []byte) []byte {
 				copy(p[i+1:], p[i+3:])
 				n -= 2
 			}
+			off = i + 2
+			continue
 		}
-		off += 2
+		break
 	}
 	return p[:n]
 }
