@@ -82,6 +82,8 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 			allow = allow && p[i] != '?'
 		case modeHash:
 			allow = allow || p[i] == '#' || p[i] == '?' || p[i] == '=' || p[i] == '!' || p[i] == '(' || p[i] == ')' || p[i] == '*'
+		default:
+			// noop
 		}
 		if allow {
 			dst = append(dst, p[i])
