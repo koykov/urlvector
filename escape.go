@@ -3,8 +3,6 @@ package urlvector
 import (
 	"reflect"
 	"unsafe"
-
-	"github.com/koykov/bytealg"
 )
 
 type mode int
@@ -47,26 +45,21 @@ func unescape(p []byte) []byte {
 		return p
 	}
 	_ = p[l-1]
-	off := 0
-	var i int
-	for {
-		if i = bytealg.IndexByteAtBytes(p, '+', off); i != -1 {
-			p[i] = ' '
-			off = i + 1
-			continue
-		}
-		if i = bytealg.IndexByteAtBytes(p, '%', off); i != -1 && i+2 < l {
-			x2 := hex[p[i+2]]
-			x1 := hex[p[i+1]]
-			if x1 != 16 || x2 != 16 {
-				p[i] = x1<<4 | x2
-				copy(p[i+1:], p[i+3:])
-				n -= 2
+	for i := 0; i < n; i++ {
+		switch p[i] {
+		case '%':
+			if i+2 < l {
+				x2 := hex[p[i+2]]
+				x1 := hex[p[i+1]]
+				if x1 != 16 || x2 != 16 {
+					p[i] = x1<<4 | x2
+					copy(p[i+1:], p[i+3:])
+					n -= 2
+				}
 			}
-			off = i + 2
-			continue
+		case '+':
+			p[i] = ' '
 		}
-		break
 	}
 	return p[:n]
 }
