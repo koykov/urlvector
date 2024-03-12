@@ -50,7 +50,6 @@ var (
 	bSchemaSep = []byte("://")
 	bSlashes   = []byte("//")
 	bSlash     = []byte("/")
-	bBSlash    = []byte("\\")
 	bColon     = []byte(":")
 	bAt        = []byte("@")
 	bQM        = []byte("?")
