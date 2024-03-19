@@ -1,6 +1,10 @@
 package urlvector
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/koykov/vector"
+)
 
 // Pool represents URL vectors pool.
 type Pool struct {
@@ -42,3 +46,11 @@ func Acquire() *Vector {
 func Release(vec *Vector) {
 	P.Put(vec)
 }
+
+// ReleaseNC puts vector back to pool with enforced no-clear flag.
+func ReleaseNC(vec *Vector) {
+	vec.SetBit(vector.FlagNoClear, true)
+	P.Put(vec)
+}
+
+var _ = ReleaseNC
