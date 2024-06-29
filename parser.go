@@ -2,6 +2,7 @@ package urlvector
 
 import (
 	"bytes"
+	"errors"
 
 	"github.com/koykov/bytealg"
 	"github.com/koykov/fastconv"
@@ -60,12 +61,15 @@ var (
 
 	// Keys source array and raw address of it.
 	bKeys = []byte("schemeslashesauthusernamepasswordhosthostnameportpathnamequeryoriginhashtruequery")
+
+	errBadInit = errors.New("bad vector initialization, use urlvector.NewVector() or urlvector.Acquire()")
 )
 
 // Main internal parser helper.
 func (vec *Vector) parse(s []byte, copy bool) (err error) {
-	if vec.Helper == nil {
-		vec.Helper = helper
+	if !vec.init {
+		err = errBadInit
+		return
 	}
 
 	s = bytealg.Trim(s, bSpace)
