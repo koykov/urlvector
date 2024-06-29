@@ -34,11 +34,12 @@ const (
 // Vector represents URL parser.
 type Vector struct {
 	vector.Vector
+	init bool
 }
 
 // NewVector makes new parser.
 func NewVector() *Vector {
-	vec := &Vector{}
+	vec := &Vector{init: true}
 	vec.Helper = helper
 	return vec
 }
