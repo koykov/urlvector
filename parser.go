@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/koykov/bytealg"
-	"github.com/koykov/fastconv"
+	"github.com/koykov/byteconv"
 	"github.com/koykov/vector"
 )
 
@@ -358,7 +358,7 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 		}
 
 		if kl := len(k); kl > 2 && bytes.Equal(k[kl-2:], bQB) {
-			if root = query.Get(fastconv.B2S(k)); root.Type() != vector.TypeArr {
+			if root = query.Get(byteconv.B2S(k)); root.Type() != vector.TypeArr {
 				root, _ = vec.GetChildWT(query, 2, vector.TypeArr)
 				root.SetOffset(vec.Index.Len(3))
 				root.Key().Init(origin, offset, len(k))

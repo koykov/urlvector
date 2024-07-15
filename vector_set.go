@@ -1,7 +1,7 @@
 package urlvector
 
 import (
-	"github.com/koykov/fastconv"
+	"github.com/koykov/byteconv"
 	"github.com/koykov/vector"
 )
 
@@ -12,7 +12,7 @@ func (vec *Vector) SetSchemeBytes(scheme []byte) *Vector {
 
 // SetSchemeString replaces scheme with string.
 func (vec *Vector) SetSchemeString(scheme string) *Vector {
-	return vec.SetSchemeBytes(fastconv.S2B(scheme))
+	return vec.SetSchemeBytes(byteconv.S2B(scheme))
 }
 
 // SetAuthBytes replaces auth with bytes.
@@ -22,7 +22,7 @@ func (vec *Vector) SetAuthBytes(auth []byte) *Vector {
 
 // SetAuthString replaces auth with string.
 func (vec *Vector) SetAuthString(auth string) *Vector {
-	return vec.SetAuthBytes(fastconv.S2B(auth))
+	return vec.SetAuthBytes(byteconv.S2B(auth))
 }
 
 // SetUsernameBytes replaces username with bytes.
@@ -32,7 +32,7 @@ func (vec *Vector) SetUsernameBytes(username []byte) *Vector {
 
 // SetUsernameString replaces username with string.
 func (vec *Vector) SetUsernameString(username string) *Vector {
-	return vec.SetUsernameBytes(fastconv.S2B(username))
+	return vec.SetUsernameBytes(byteconv.S2B(username))
 }
 
 // SetPasswordBytes replaces password with bytes.
@@ -42,7 +42,7 @@ func (vec *Vector) SetPasswordBytes(password []byte) *Vector {
 
 // SetPasswordString replaces password with string.
 func (vec *Vector) SetPasswordString(password string) *Vector {
-	return vec.SetPasswordBytes(fastconv.S2B(password))
+	return vec.SetPasswordBytes(byteconv.S2B(password))
 }
 
 // SetHostBytes replaces host with bytes.
@@ -52,7 +52,7 @@ func (vec *Vector) SetHostBytes(host []byte) *Vector {
 
 // SetHostString replaces host with string.
 func (vec *Vector) SetHostString(host string) *Vector {
-	return vec.SetHostBytes(fastconv.S2B(host))
+	return vec.SetHostBytes(byteconv.S2B(host))
 }
 
 // SetHostnameBytes replaces hostname with bytes.
@@ -62,7 +62,7 @@ func (vec *Vector) SetHostnameBytes(hostname []byte) *Vector {
 
 // SetHostnameString replaces hostname with string.
 func (vec *Vector) SetHostnameString(hostname string) *Vector {
-	return vec.SetHostnameBytes(fastconv.S2B(hostname))
+	return vec.SetHostnameBytes(byteconv.S2B(hostname))
 }
 
 // SetPort replaces port.
@@ -84,7 +84,7 @@ func (vec *Vector) SetPathBytes(path []byte) *Vector {
 
 // SetPathString replaces path with string.
 func (vec *Vector) SetPathString(path string) *Vector {
-	return vec.SetPathBytes(fastconv.S2B(path))
+	return vec.SetPathBytes(byteconv.S2B(path))
 }
 
 // SetQueryBytes replaces query with bytes.
@@ -99,7 +99,7 @@ func (vec *Vector) SetQueryBytes(query []byte) *Vector {
 
 // SetQueryString replaces query with string.
 func (vec *Vector) SetQueryString(query string) *Vector {
-	return vec.SetQueryBytes(fastconv.S2B(query))
+	return vec.SetQueryBytes(byteconv.S2B(query))
 }
 
 // SetHashBytes replaces hash with bytes.
@@ -109,7 +109,7 @@ func (vec *Vector) SetHashBytes(hash []byte) *Vector {
 
 // SetHashString replaces hash with string.
 func (vec *Vector) SetHashString(hash string) *Vector {
-	return vec.SetHashBytes(fastconv.S2B(hash))
+	return vec.SetHashBytes(byteconv.S2B(hash))
 }
 
 // Internal setter.

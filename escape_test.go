@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/koykov/fastconv"
+	"github.com/koykov/byteconv"
 )
 
 var stages = []struct {
@@ -52,8 +52,8 @@ func TestEscape(t *testing.T) {
 	for i, stage := range stages {
 		t.Run("query/"+strconv.Itoa(i), func(t *testing.T) {
 			var buf []byte
-			buf = QueryEscape(buf[:0], fastconv.S2B(stage.raw))
-			if r := fastconv.B2S(buf); r != stage.exp {
+			buf = QueryEscape(buf[:0], byteconv.S2B(stage.raw))
+			if r := byteconv.B2S(buf); r != stage.exp {
 				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp, r)
 			}
 		})
@@ -61,8 +61,8 @@ func TestEscape(t *testing.T) {
 	for i, stage := range stages {
 		t.Run("path/"+strconv.Itoa(i), func(t *testing.T) {
 			var buf []byte
-			buf = PathEscape(buf[:0], fastconv.S2B(stage.raw))
-			if r := fastconv.B2S(buf); r != stage.exp1 {
+			buf = PathEscape(buf[:0], byteconv.S2B(stage.raw))
+			if r := byteconv.B2S(buf); r != stage.exp1 {
 				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp1, r)
 			}
 		})
@@ -73,8 +73,8 @@ func TestUnescape(t *testing.T) {
 	for i, stage := range stages {
 		t.Run("query/"+strconv.Itoa(i), func(t *testing.T) {
 			var buf []byte
-			buf = QueryUnescape(buf[:0], fastconv.S2B(stage.exp))
-			if r := fastconv.B2S(buf); r != stage.raw {
+			buf = QueryUnescape(buf[:0], byteconv.S2B(stage.exp))
+			if r := byteconv.B2S(buf); r != stage.raw {
 				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp, r)
 			}
 		})
@@ -85,8 +85,8 @@ func TestUnescape(t *testing.T) {
 				return
 			}
 			var buf []byte
-			buf = PathUnescape(buf[:0], fastconv.S2B(stage.exp1))
-			if r := fastconv.B2S(buf); r != stage.raw {
+			buf = PathUnescape(buf[:0], byteconv.S2B(stage.exp1))
+			if r := byteconv.B2S(buf); r != stage.raw {
 				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.raw, r)
 			}
 		})
@@ -99,8 +99,8 @@ func BenchmarkEscape(b *testing.B) {
 			var buf []byte
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
-				buf = QueryEscape(buf[:0], fastconv.S2B(stage.raw))
-				if r := fastconv.B2S(buf); r != stage.exp {
+				buf = QueryEscape(buf[:0], byteconv.S2B(stage.raw))
+				if r := byteconv.B2S(buf); r != stage.exp {
 					b.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp, r)
 				}
 			}
@@ -111,8 +111,8 @@ func BenchmarkEscape(b *testing.B) {
 			var buf []byte
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
-				buf = PathEscape(buf[:0], fastconv.S2B(stage.raw))
-				if r := fastconv.B2S(buf); r != stage.exp1 {
+				buf = PathEscape(buf[:0], byteconv.S2B(stage.raw))
+				if r := byteconv.B2S(buf); r != stage.exp1 {
 					b.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp1, r)
 				}
 			}
@@ -126,8 +126,8 @@ func BenchmarkUnescape(b *testing.B) {
 			var buf []byte
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
-				buf = QueryUnescape(buf[:0], fastconv.S2B(stage.exp))
-				if r := fastconv.B2S(buf); r != stage.raw {
+				buf = QueryUnescape(buf[:0], byteconv.S2B(stage.exp))
+				if r := byteconv.B2S(buf); r != stage.raw {
 					b.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp, r)
 				}
 			}
@@ -138,8 +138,8 @@ func BenchmarkUnescape(b *testing.B) {
 			var buf []byte
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
-				buf = PathUnescape(buf[:0], fastconv.S2B(stage.exp1))
-				if r := fastconv.B2S(buf); r != stage.raw {
+				buf = PathUnescape(buf[:0], byteconv.S2B(stage.exp1))
+				if r := byteconv.B2S(buf); r != stage.raw {
 					b.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.raw, r)
 				}
 			}
