@@ -95,56 +95,56 @@ func (vec *Vector) bytes(esc bool) []byte {
 	offset := vec.BufLen()
 
 	if scheme := vec.SchemeBytes(); len(scheme) > 0 {
-		vec.BufAppend(scheme)
-		vec.BufAppend(bSchemaSep)
+		vec.Bufferize(scheme)
+		vec.Bufferize(bSchemaSep)
 	} else if vec.Slashes() {
-		vec.BufAppend(bSlashes)
+		vec.Bufferize(bSlashes)
 	}
 
 	if username := vec.UsernameBytes(); len(username) > 0 {
-		vec.BufAppend(username)
+		vec.Bufferize(username)
 		if password := vec.PasswordBytes(); len(password) > 0 {
-			vec.BufAppend(bColon)
-			vec.BufAppend(password)
+			vec.Bufferize(bColon)
+			vec.Bufferize(password)
 		}
-		vec.BufAppend(bAt)
+		vec.Bufferize(bAt)
 	}
 
 	if hostname := vec.HostnameBytes(); len(hostname) > 0 {
-		vec.BufAppend(hostname)
+		vec.Bufferize(hostname)
 		if port := vec.getByIdx(idxPort); port.Value().Len() > 0 {
-			vec.BufAppend(bColon)
-			vec.BufAppend(port.Bytes())
+			vec.Bufferize(bColon)
+			vec.Bufferize(port.Bytes())
 		}
 	}
 
 	if path := vec.PathBytes(); len(path) > 0 {
 		if path[0] != '/' {
-			vec.BufAppend(bSlash)
+			vec.Bufferize(bSlash)
 		}
 		if esc {
 			vecEscape(vec, path, modePath)
 		} else {
-			vec.BufAppend(path)
+			vec.Bufferize(path)
 		}
 	}
 
 	if !vec.CheckBit(flagQueryParsed) {
 		if query := vec.QueryBytes(); len(query) > 0 {
 			if query[0] != '?' {
-				vec.BufAppend(bQM)
+				vec.Bufferize(bQM)
 			}
-			vec.BufAppend(query)
+			vec.Bufferize(query)
 		}
 	} else {
 		if query := vec.getByIdx(idxQuery); query.Limit() > 0 {
-			vec.BufAppend(bQM)
+			vec.Bufferize(bQM)
 			query.Each(func(idx int, node *vector.Node) {
 				if idx > 0 {
-					vec.BufAppend(bAmp)
+					vec.Bufferize(bAmp)
 				}
-				vec.BufAppend(node.KeyBytes())
-				vec.BufAppend(bEq)
+				vec.Bufferize(node.KeyBytes())
+				vec.Bufferize(bEq)
 				vecEscape(vec, node.Value().Bytes(), modeQuery)
 			})
 		}
@@ -152,12 +152,12 @@ func (vec *Vector) bytes(esc bool) []byte {
 
 	if hash := vec.HashBytes(); len(hash) > 0 {
 		if hash[0] != '#' {
-			vec.BufAppend(bHash)
+			vec.Bufferize(bHash)
 		}
 		if esc {
 			vecEscape(vec, hash, modeHash)
 		} else {
-			vec.BufAppend(hash)
+			vec.Bufferize(hash)
 		}
 	}
 
@@ -240,15 +240,15 @@ func (vec *Vector) queryOrigin() *vector.Node {
 		vec.SetBit(flagQueryMod, false)
 		offset := vec.BufLen()
 		limit := 1
-		vec.BufAppendStr("?")
+		vec.BufferizeString("?")
 		query := vec.getByIdx(idxQuery)
 		query.Each(func(idx int, node *vector.Node) {
 			if idx > 0 {
-				vec.BufAppendStr("&")
+				vec.BufferizeString("&")
 				limit++
 			}
 			key := vecEscape(vec, node.KeyBytes(), modeQuery)
-			vec.BufAppendStr("=")
+			vec.BufferizeString("=")
 			val := vecEscape(vec, node.Bytes(), modeQuery)
 			limit += len(key) + len(val) + 1
 		})
@@ -256,7 +256,7 @@ func (vec *Vector) queryOrigin() *vector.Node {
 
 		queryOrigin.Value().Init(vec.Buf(), offset, limit)
 		queryOrigin.Value().SetBit(flagBufSrc, true)
-		vec.PutNode(queryOrigin.Index(), queryOrigin)
+		vec.ReleaseNode(queryOrigin.Index(), queryOrigin)
 	}
 	return queryOrigin
 }
