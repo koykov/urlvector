@@ -69,7 +69,7 @@ func (vec *Vector) SetHostnameString(hostname string) *Vector {
 func (vec *Vector) SetPort(port int) *Vector {
 	vec.SetBit(flagBufMod, true)
 	offset := vec.BufLen()
-	vec.BufAppendInt(int64(port))
+	vec.BufferizeInt(int64(port))
 	l := vec.BufLen() - offset
 	node := vec.getByIdx(idxPort)
 	node.Value().Init(vec.Buf(), offset, l)
@@ -116,7 +116,7 @@ func (vec *Vector) SetHashString(hash string) *Vector {
 func (vec *Vector) set(node *vector.Node, s []byte) *Vector {
 	vec.SetBit(flagBufMod, true)
 	offset := vec.BufLen()
-	vec.BufAppend(s)
+	vec.Bufferize(s)
 	node.Value().Init(vec.Buf(), offset, len(s))
 	node.Value().SetBit(flagBufSrc, true)
 	return vec

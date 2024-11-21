@@ -1,8 +1,9 @@
 package urlvector
 
 import (
-	"reflect"
 	"unsafe"
+
+	"github.com/koykov/byteconv"
 )
 
 type mode int
@@ -160,7 +161,7 @@ func vecEscape(vec *Vector, p []byte, mode mode) []byte {
 	}
 	o := vec.BufLen()
 	buf := bufEscape(vec.Buf(), p, mode)
-	vec.BufUpdateWith(buf)
+	vec.BufReplaceWith(buf)
 	return vec.Buf()[o:]
 }
 
@@ -171,7 +172,7 @@ func vecUnescape(vec *Vector, p []byte, mode mode) []byte {
 
 // Check if a and b has the same pointers. Needs for in-place escape/unescape.
 func samePtr(a, b []byte) bool {
-	ah := *(*reflect.SliceHeader)(unsafe.Pointer(&a))
-	bh := *(*reflect.SliceHeader)(unsafe.Pointer(&b))
+	ah := *(*byteconv.SliceHeader)(unsafe.Pointer(&a))
+	bh := *(*byteconv.SliceHeader)(unsafe.Pointer(&b))
 	return ah.Data == bh.Data && ah.Len == bh.Len && ah.Cap == bh.Cap
 }

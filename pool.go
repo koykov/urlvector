@@ -12,11 +12,9 @@ type Pool struct {
 }
 
 var (
-	// P is a default instance of the pool.
+	// p is a default instance of the pool.
 	// Just call urlvector.Acquire() and urlvector.Release().
-	P Pool
-	// Suppress go vet warnings.
-	_, _ = Acquire, Release
+	p Pool
 )
 
 // Get old vector from the pool or create new one.
@@ -39,18 +37,18 @@ func (p *Pool) Put(vec *Vector) {
 
 // Acquire returns vector from default pool instance.
 func Acquire() *Vector {
-	return P.Get()
+	return p.Get()
 }
 
 // Release puts vector back to default pool instance.
 func Release(vec *Vector) {
-	P.Put(vec)
+	p.Put(vec)
 }
 
 // ReleaseNC puts vector back to pool with enforced no-clear flag.
 func ReleaseNC(vec *Vector) {
 	vec.SetBit(vector.FlagNoClear, true)
-	P.Put(vec)
+	p.Put(vec)
 }
 
-var _ = ReleaseNC
+var _, _, _ = Acquire, Release, ReleaseNC

@@ -84,7 +84,7 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 
 	offset := 0
 	// Create root node and register it.
-	root, i := vec.GetNodeWT(0, vector.TypeObj)
+	root, i := vec.AcquireNodeWithType(0, vector.TypeObject)
 	root.SetOffset(vec.Index.Len(1))
 
 	// Parse URL parts.
@@ -110,7 +110,7 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 	}
 
 	// Return root node back to the vector.
-	vec.putNode(i, root)
+	vec.relNode(i, root)
 
 	// Check unparsed tail.
 	if offset < vec.SrcLen() {
@@ -126,8 +126,8 @@ func (vec *Vector) parse(s []byte, copy bool) (err error) {
 func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
-	scheme, isc := vec.GetChildWT(node, depth, vector.TypeStr)
-	slashes, isl := vec.GetChildWT(node, depth, vector.TypeBool)
+	scheme, isc := vec.AcquireChildWithType(node, depth, vector.TypeString)
+	slashes, isl := vec.AcquireChildWithType(node, depth, vector.TypeBool)
 
 	limit := maxSchemaLen
 	if sl := vec.SrcLen(); sl < limit {
@@ -146,8 +146,8 @@ func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error
 		offset += 2
 	}
 
-	vec.putNode(isc, scheme)
-	vec.putNode(isl, slashes)
+	vec.relNode(isc, scheme)
+	vec.relNode(isl, slashes)
 
 	return offset, err
 }
@@ -156,9 +156,9 @@ func (vec *Vector) parseScheme(depth, offset int, node *vector.Node) (int, error
 func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
-	auth, ia := vec.GetChildWT(node, depth, vector.TypeStr)
-	username, iu := vec.GetChildWT(node, depth, vector.TypeStr)
-	password, ip := vec.GetChildWT(node, depth, vector.TypeStr)
+	auth, ia := vec.AcquireChildWithType(node, depth, vector.TypeString)
+	username, iu := vec.AcquireChildWithType(node, depth, vector.TypeString)
+	password, ip := vec.AcquireChildWithType(node, depth, vector.TypeString)
 
 	src := vec.Src()
 	n := len(src)
@@ -188,9 +188,9 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 		offset = posAt + 1
 	}
 
-	vec.putNode(ia, auth)
-	vec.putNode(iu, username)
-	vec.putNode(ip, password)
+	vec.relNode(ia, auth)
+	vec.relNode(iu, username)
+	vec.relNode(ip, password)
 
 	return offset, err
 }
@@ -199,9 +199,9 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
-	host, ih := vec.GetChildWT(node, depth, vector.TypeStr)
-	hostname, in := vec.GetChildWT(node, depth, vector.TypeStr)
-	port, ip := vec.GetChildWT(node, depth, vector.TypeNum)
+	host, ih := vec.AcquireChildWithType(node, depth, vector.TypeString)
+	hostname, in := vec.AcquireChildWithType(node, depth, vector.TypeString)
+	port, ip := vec.AcquireChildWithType(node, depth, vector.TypeNumber)
 
 	src := vec.Src()
 	n := len(src)
@@ -241,9 +241,9 @@ loop:
 		hostname.Value().Init(src, offset, posSl-offset)
 	}
 
-	vec.putNode(ih, host)
-	vec.putNode(in, hostname)
-	vec.putNode(ip, port)
+	vec.relNode(ih, host)
+	vec.relNode(in, hostname)
+	vec.relNode(ip, port)
 
 	offset = posSl
 
@@ -254,7 +254,7 @@ loop:
 func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
-	path, i := vec.GetChildWT(node, depth, vector.TypeStr)
+	path, i := vec.AcquireChildWithType(node, depth, vector.TypeString)
 
 	src := vec.Src()
 	n := len(src)
@@ -280,7 +280,7 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 		offset = posQM
 	}
 
-	vec.putNode(i, path)
+	vec.relNode(i, path)
 
 	return offset, err
 }
@@ -292,9 +292,9 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error) {
 	var err error
 
-	queryOrig, iqo := vec.GetChildWT(node, depth, vector.TypeStr)
-	hash, ih := vec.GetChildWT(node, depth, vector.TypeStr)
-	query, iq := vec.GetChildWT(node, depth, vector.TypeObj)
+	queryOrig, iqo := vec.AcquireChildWithType(node, depth, vector.TypeString)
+	hash, ih := vec.AcquireChildWithType(node, depth, vector.TypeString)
+	query, iq := vec.AcquireChildWithType(node, depth, vector.TypeObject)
 
 	src := vec.Src()
 	n := len(src)
@@ -314,9 +314,9 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 		offset = n
 	}
 
-	vec.putNode(iqo, queryOrig)
-	vec.putNode(ih, hash)
-	vec.putNode(iq, query)
+	vec.relNode(iqo, queryOrig)
+	vec.relNode(ih, hash)
+	vec.relNode(iq, query)
 
 	return offset, err
 }
@@ -358,26 +358,26 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 		}
 
 		if kl := len(k); kl > 2 && bytes.Equal(k[kl-2:], bQB) {
-			if root = query.Get(byteconv.B2S(k)); root.Type() != vector.TypeArr {
-				root, _ = vec.GetChildWT(query, 2, vector.TypeArr)
+			if root = query.Get(byteconv.B2S(k)); root.Type() != vector.TypeArray {
+				root, _ = vec.AcquireChildWithType(query, 2, vector.TypeArray)
 				root.SetOffset(vec.Index.Len(3))
 				root.Key().Init(origin, offset, len(k))
 			}
-			node, idx = vec.GetChildWT(root, 3, vector.TypeStr)
+			node, idx = vec.AcquireChildWithType(root, 3, vector.TypeString)
 			if len(v) > 0 {
 				v = unescape(v)
 				node.Value().Init(origin, offset+len(k)+1, len(v))
 			}
-			vec.putNode(idx, node)
-			vec.PutNode(root.Index(), root)
+			vec.relNode(idx, node)
+			vec.ReleaseNode(root.Index(), root)
 		} else {
-			node, idx = vec.GetChildWT(query, 2, vector.TypeStr)
+			node, idx = vec.AcquireChildWithType(query, 2, vector.TypeString)
 			node.Key().Init(origin, offset, len(k))
 			if len(v) > 0 {
 				v = unescape(v)
 				node.Value().Init(origin, offset+len(k)+1, len(v))
 			}
-			vec.putNode(idx, node)
+			vec.relNode(idx, node)
 		}
 
 		offset = i + 1
@@ -385,13 +385,13 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 			break
 		}
 	}
-	vec.putNode(query.Index(), query)
+	vec.relNode(query.Index(), query)
 }
 
-// Call vector.PutNode() and set required flags before.
-func (vec *Vector) putNode(idx int, node *vector.Node) {
+// Call vector.ReleaseNode() and set required flags before.
+func (vec *Vector) relNode(idx int, node *vector.Node) {
 	vec.ensureFlags(node)
-	vec.PutNode(idx, node)
+	vec.ReleaseNode(idx, node)
 }
 
 // Consider source origin and set flags.
@@ -401,7 +401,6 @@ func (vec *Vector) ensureFlags(node *vector.Node) {
 	}
 }
 
-// Int version of math.Max().
 func max_(a, b int) int {
 	if a > b {
 		return a
