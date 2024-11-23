@@ -67,7 +67,7 @@ var (
 
 // Main internal parser helper.
 func (vec *Vector) parse(s []byte, copy bool) (err error) {
-	if !vec.init {
+	if !vec.CheckBit(vector.FlagInit) {
 		err = errBadInit
 		return
 	}
