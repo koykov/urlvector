@@ -12,7 +12,7 @@ It just stores an array with indexes of each part of the url (schema, hostname, 
 src := "http://x.com/x/y/z?arr[]=1&arr[]=2&arr[]=3&b=x&arr1[]=a&arr1[]=b&arr1[]=c"
 vec := urlvector.Acquire()
 defer urlvector.Release(vec)
-_ = vec.ParseStr(src)
+_ = vec.ParseString(src)
 fmt.Println("host", vec.HostString())
 fmt.Println("path", vec.PathString())
 fmt.Println("query:")
