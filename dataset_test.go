@@ -44,7 +44,7 @@ func TestDataset(t *testing.T) {
 	vec := NewVector()
 	for i := 0; i < len(dsStages); i++ {
 		stg := &dsStages[i]
-		err := vec.ParseCopyStr(stg.src)
+		err := vec.ParseCopyString(stg.src)
 		if err != nil {
 			t.Error(err)
 		}
@@ -61,7 +61,7 @@ func BenchmarkDataset(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		stg := &dsStages[i%len(dsStages)]
 		vec := Acquire()
-		_ = vec.ParseCopyStr(stg.src)
+		_ = vec.ParseCopyString(stg.src)
 		_ = vec.Query()
 		Release(vec)
 	}

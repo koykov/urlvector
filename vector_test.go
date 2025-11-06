@@ -185,7 +185,7 @@ func TestVector(t *testing.T) {
 	for i, tst := range cases {
 		t.Run(fmt.Sprintf("parse/%d", i), func(t *testing.T) {
 			vec.Reset()
-			err := vec.ParseStr(tst.url)
+			err := vec.ParseString(tst.url)
 			if err != nil {
 				if err != tst.target.err {
 					t.Error(i, err)
@@ -281,7 +281,7 @@ func TestVector(t *testing.T) {
 
 	t.Run("remove if", func(t *testing.T) {
 		vec.Reset()
-		_ = vec.ParseStr(queryRemove)
+		_ = vec.ParseString(queryRemove)
 		vec.Query().RemoveIf(func(_ int, node *vector.Node) bool {
 			return strings.HasPrefix(node.KeyString(), "utm")
 		})
@@ -380,7 +380,7 @@ func BenchmarkVector(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
-			if err := vec.ParseStr(tst.url); err != nil {
+			if err := vec.ParseString(tst.url); err != nil {
 				b.Fatal(err)
 			}
 
@@ -556,7 +556,7 @@ func BenchmarkVector(b *testing.B) {
 
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
-			_ = vec.ParseStr(queryRemove)
+			_ = vec.ParseString(queryRemove)
 			vec.Query().RemoveIf(func(_ int, node *vector.Node) bool {
 				return strings.HasPrefix(node.KeyString(), "utm")
 			})

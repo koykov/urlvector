@@ -49,8 +49,8 @@ func (vec *Vector) Parse(s []byte) error {
 	return vec.parse(s, false)
 }
 
-// ParseStr parses source string.
-func (vec *Vector) ParseStr(s string) error {
+// ParseString parses source string.
+func (vec *Vector) ParseString(s string) error {
 	return vec.parse(byteconv.S2B(s), false)
 }
 
@@ -59,8 +59,8 @@ func (vec *Vector) ParseCopy(s []byte) error {
 	return vec.parse(s, true)
 }
 
-// ParseCopyStr copies source string and parse it.
-func (vec *Vector) ParseCopyStr(s string) error {
+// ParseCopyString copies source string and parse it.
+func (vec *Vector) ParseCopyString(s string) error {
 	return vec.parse(byteconv.S2B(s), true)
 }
 
