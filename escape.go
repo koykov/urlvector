@@ -12,7 +12,7 @@ const (
 	modePath mode = iota
 	modeQuery
 	modeHash
-	modeEncURI
+	modeURIComponent
 
 	hex = "\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x00\x01\x02\x03\x04\x05\x06\a\b\t\x10\x10\x10\x10\x10\x10\x10\n\v\f\r\x0e\x0f\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\n\v\f\r\x0e\x0f\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10"
 	// Hex digits in upper case.
@@ -41,12 +41,12 @@ func PathUnescape(dst, p []byte) []byte {
 
 // EncodeURIComponent escaped the string according https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
 func EncodeURIComponent(dst, p []byte) []byte {
-	return bufEscape(dst, p, modeEncURI)
+	return bufEscape(dst, p, modeURIComponent)
 }
 
 // DecodeURIComponent escaped the string according https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
 func DecodeURIComponent(dst, p []byte) []byte {
-	return bufUnescape(dst, p, modeEncURI)
+	return bufUnescape(dst, p, modeURIComponent)
 }
 
 // In-place unescape bytes.
@@ -94,7 +94,7 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 			allow = allow && p[i] != '?'
 		case modeHash:
 			allow = allow || p[i] == '#' || p[i] == '?' || p[i] == '=' || p[i] == '!' || p[i] == '(' || p[i] == ')' || p[i] == '*'
-		case modeEncURI:
+		case modeURIComponent:
 			allow = allow || p[i] == '!' || p[i] == '~' || p[i] == '*' || p[i] == '\'' || p[i] == '(' || p[i] == ')'
 		default:
 			// noop
@@ -104,7 +104,7 @@ func bufEscape(dst, p []byte, mode mode) []byte {
 			n++
 		} else if p[i] == ' ' {
 			switch mode {
-			case modePath, modeEncURI:
+			case modePath, modeURIComponent:
 				dst = append(dst, "%20"...)
 				n += 3
 			default:
