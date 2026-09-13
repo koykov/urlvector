@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/koykov/byteconv"
+	"github.com/stretchr/testify/assert"
 )
 
 var stages = []struct {
@@ -57,27 +58,24 @@ func TestEscape(t *testing.T) {
 		t.Run("query/"+strconv.Itoa(i), func(t *testing.T) {
 			var buf []byte
 			buf = QueryEscape(buf[:0], byteconv.S2B(stage.raw))
-			if r := byteconv.B2S(buf); r != stage.exp {
-				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp, r)
-			}
+			r := byteconv.B2S(buf)
+			assert.True(t, stage.exp == r, "escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp, r)
 		})
 	}
 	for i, stage := range stages {
 		t.Run("path/"+strconv.Itoa(i), func(t *testing.T) {
 			var buf []byte
 			buf = PathEscape(buf[:0], byteconv.S2B(stage.raw))
-			if r := byteconv.B2S(buf); r != stage.exp1 {
-				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp1, r)
-			}
+			r := byteconv.B2S(buf)
+			assert.True(t, stage.exp1 == r, "escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp1, r)
 		})
 	}
 	for i, stage := range stages {
 		t.Run("decodeURIComponent/"+strconv.Itoa(i), func(t *testing.T) {
 			var buf []byte
 			buf = EncodeURIComponent(buf[:0], byteconv.S2B(stage.raw))
-			if r := byteconv.B2S(buf); r != stage.exp2 {
-				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp2, r)
-			}
+			r := byteconv.B2S(buf)
+			assert.True(t, stage.exp2 == r, "escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp2, r)
 		})
 	}
 }
@@ -87,9 +85,8 @@ func TestUnescape(t *testing.T) {
 		t.Run("query/"+strconv.Itoa(i), func(t *testing.T) {
 			var buf []byte
 			buf = QueryUnescape(buf[:0], byteconv.S2B(stage.exp))
-			if r := byteconv.B2S(buf); r != stage.raw {
-				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp, r)
-			}
+			r := byteconv.B2S(buf)
+			assert.True(t, stage.raw == r, "escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.exp, r)
 		})
 	}
 	for i, stage := range stages {
@@ -99,9 +96,8 @@ func TestUnescape(t *testing.T) {
 			}
 			var buf []byte
 			buf = PathUnescape(buf[:0], byteconv.S2B(stage.exp1))
-			if r := byteconv.B2S(buf); r != stage.raw {
-				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.raw, r)
-			}
+			r := byteconv.B2S(buf)
+			assert.True(t, stage.raw == r, "escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.raw, r)
 		})
 	}
 	for i, stage := range stages {
@@ -111,9 +107,8 @@ func TestUnescape(t *testing.T) {
 			}
 			var buf []byte
 			buf = DecodeURIComponent(buf[:0], byteconv.S2B(stage.exp2))
-			if r := byteconv.B2S(buf); r != stage.raw {
-				t.Errorf("escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.raw, r)
-			}
+			r := byteconv.B2S(buf)
+			assert.True(t, stage.raw == r, "escape mismatch:\n\tneed '%s'\n\tgot  '%s'", stage.raw, r)
 		})
 	}
 }

@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var dsStages []struct {
@@ -45,9 +47,7 @@ func TestDataset(t *testing.T) {
 	for i := 0; i < len(dsStages); i++ {
 		stg := &dsStages[i]
 		err := vec.ParseCopyString(stg.src)
-		if err != nil {
-			t.Error(err)
-		}
+		require.NoError(t, err)
 		_ = vec.Query()
 		vec.Reset()
 	}

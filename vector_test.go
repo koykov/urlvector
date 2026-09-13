@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/koykov/vector"
+	"github.com/stretchr/testify/assert"
 )
 
 type testTarget struct {
@@ -187,44 +188,42 @@ func TestVector(t *testing.T) {
 			vec.Reset()
 			err := vec.ParseString(tst.url)
 			if err != nil {
-				if err != tst.target.err {
-					t.Error(i, err)
-				}
+				assert.True(t, err == tst.target.err, "err mismatch at case %d: need %v, got %v", i, tst.target.err, err)
 				return
 			}
 
-			if len(tst.target.scheme) > 0 && vec.SchemeString() != tst.target.scheme {
-				printErr(t, &tst, "scheme mismatch", vec.SchemeString(), "vs", tst.target.scheme)
+			if len(tst.target.scheme) > 0 {
+				assert.True(t, vec.SchemeString() == tst.target.scheme, "scheme mismatch: %s vs %s", vec.SchemeString(), tst.target.scheme)
 			}
-			if tst.target.slashes && vec.Slashes() != tst.target.slashes {
-				printErr(t, &tst, "slashes mismatch", vec.Slashes(), "vs", tst.target.slashes)
+			if tst.target.slashes {
+				assert.True(t, vec.Slashes() == tst.target.slashes, "slashes mismatch: %v vs %v", vec.Slashes(), tst.target.slashes)
 			}
-			if len(tst.target.auth) > 0 && vec.AuthString() != tst.target.auth {
-				printErr(t, &tst, "auth mismatch", vec.AuthString(), "vs", tst.target.auth)
+			if len(tst.target.auth) > 0 {
+				assert.True(t, vec.AuthString() == tst.target.auth, "auth mismatch: %s vs %s", vec.AuthString(), tst.target.auth)
 			}
-			if len(tst.target.username) > 0 && vec.UsernameString() != tst.target.username {
-				printErr(t, &tst, "username mismatch", vec.UsernameString(), "vs", tst.target.username)
+			if len(tst.target.username) > 0 {
+				assert.True(t, vec.UsernameString() == tst.target.username, "username mismatch: %s vs %s", vec.UsernameString(), tst.target.username)
 			}
-			if len(tst.target.password) > 0 && vec.PasswordString() != tst.target.password {
-				printErr(t, &tst, "password mismatch", vec.PasswordString(), "vs", tst.target.password)
+			if len(tst.target.password) > 0 {
+				assert.True(t, vec.PasswordString() == tst.target.password, "password mismatch: %s vs %s", vec.PasswordString(), tst.target.password)
 			}
-			if len(tst.target.host) > 0 && vec.HostString() != tst.target.host {
-				printErr(t, &tst, "host mismatch", vec.HostString(), "vs", tst.target.host)
+			if len(tst.target.host) > 0 {
+				assert.True(t, vec.HostString() == tst.target.host, "host mismatch: %s vs %s", vec.HostString(), tst.target.host)
 			}
-			if len(tst.target.hostname) > 0 && vec.HostnameString() != tst.target.hostname {
-				printErr(t, &tst, "hostname mismatch", vec.HostnameString(), "vs", tst.target.hostname)
+			if len(tst.target.hostname) > 0 {
+				assert.True(t, vec.HostnameString() == tst.target.hostname, "hostname mismatch: %s vs %s", vec.HostnameString(), tst.target.hostname)
 			}
-			if tst.target.port > 0 && vec.Port() != tst.target.port {
-				printErr(t, &tst, "port mismatch", vec.Port(), "vs", tst.target.port)
+			if tst.target.port > 0 {
+				assert.True(t, vec.Port() == tst.target.port, "port mismatch: %d vs %d", vec.Port(), tst.target.port)
 			}
-			if len(tst.target.path) > 0 && vec.PathString() != tst.target.path {
-				printErr(t, &tst, "path mismatch", vec.PathString(), "vs", tst.target.path)
+			if len(tst.target.path) > 0 {
+				assert.True(t, vec.PathString() == tst.target.path, "path mismatch: %s vs %s", vec.PathString(), tst.target.path)
 			}
-			if len(tst.target.query) > 0 && vec.QueryString() != tst.target.query {
-				printErr(t, &tst, "query mismatch", vec.QueryString(), "vs", tst.target.query)
+			if len(tst.target.query) > 0 {
+				assert.True(t, vec.QueryString() == tst.target.query, "query mismatch: %s vs %s", vec.QueryString(), tst.target.query)
 			}
-			if len(tst.target.hash) > 0 && vec.HashString() != tst.target.hash {
-				printErr(t, &tst, "hash mismatch", vec.HashString(), "vs", tst.target.hash)
+			if len(tst.target.hash) > 0 {
+				assert.True(t, vec.HashString() == tst.target.hash, "hash mismatch: %s vs %s", vec.HashString(), tst.target.hash)
 			}
 		})
 	}
@@ -237,20 +236,14 @@ func TestVector(t *testing.T) {
 		query = vec.Query()
 		query.Each(func(_ int, node *vector.Node) {
 			k := node.KeyString()
-			if query0target[k] != node.String() {
-				t.Error("query0 mismatch query param", k, "need", query0target[k], "got", node.String())
-			}
+			assert.True(t, query0target[k] == node.String(), "query0 mismatch query param %s: need %s, got %s", k, query0target[k], node.String())
 		})
 
 		vec.Reset()
 		_ = vec.Parse(query1)
 		query = vec.Query()
-		if !query.Exists("x") || query.Get("x").String() != "" {
-			t.Error("query1 mismatch query param x")
-		}
-		if !query.Exists("z") || query.Get("z").String() != "" {
-			t.Error("query1 mismatch query param z")
-		}
+		assert.True(t, query.Exists("x") && query.Get("x").String() == "", "query1 mismatch query param x")
+		assert.True(t, query.Exists("z") && query.Get("z").String() == "", "query1 mismatch query param z")
 
 		vec.Reset()
 		_ = vec.Parse(query2)
@@ -258,23 +251,13 @@ func TestVector(t *testing.T) {
 		query.Each(func(_ int, node *vector.Node) {
 			switch {
 			case node.KeyString() == "b":
-				if node.String() != "x" {
-					t.Error("query 2 mismatch query param", node.KeyString(), "need", "x", "got", node.String())
-				}
+				assert.True(t, node.String() == "x", "query 2 mismatch query param %s: need x, got %s", node.KeyString(), node.String())
 			case node.KeyString() == "arr[]":
-				if node.Limit() != 3 {
-					t.Error("query 2 unexpected length of param arr[]", "need", 3, "got", node.Limit())
-				}
-				if node.At(1).String() != "2" {
-					t.Error("query 2 mismatch query param arr[1]", "need", "2", "got", node.At(1).String())
-				}
+				assert.True(t, node.Limit() == 3, "query 2 unexpected length of param arr[]: need 3, got %d", node.Limit())
+				assert.True(t, node.At(1).String() == "2", "query 2 mismatch query param arr[1]: need 2, got %s", node.At(1).String())
 			case node.KeyString() == "arr1[]":
-				if node.Limit() != 3 {
-					t.Error("query 2 unexpected length of param arr1[]", "need", 3, "got", node.Limit())
-				}
-				if node.At(0).String() != "a" {
-					t.Error("query 2 mismatch query param arr1[0]", "need", "a", "got", node.At(0).String())
-				}
+				assert.True(t, node.Limit() == 3, "query 2 unexpected length of param arr1[]: need 3, got %d", node.Limit())
+				assert.True(t, node.At(0).String() == "a", "query 2 mismatch query param arr1[0]: need a, got %s", node.At(0).String())
 			}
 		})
 	})
@@ -285,48 +268,35 @@ func TestVector(t *testing.T) {
 		vec.Query().RemoveIf(func(_ int, node *vector.Node) bool {
 			return strings.HasPrefix(node.KeyString(), "utm")
 		})
-		if vec.QuerySort().String() != queryRemoveExpect {
-			t.FailNow()
-		}
+		assert.True(t, vec.QuerySort().String() == queryRemoveExpect, "remove if failed")
 	})
 
 	t.Run("set", func(t *testing.T) {
 		vec.Reset()
 		_ = vec.Parse(url0)
 		vec.SetHostnameString("x.com")
-		if h := vec.HostnameString(); h != "x.com" {
-			t.Error("query 2 mismatch query param arr1[0]", "need", "x.com", "got", h)
-		}
+		h := vec.HostnameString()
+		assert.True(t, h == "x.com", "hostname set failed: need x.com, got %s", h)
 		vec.SetPort(9999)
-		if p := vec.Port(); p != 9999 {
-			t.Error("query 2 mismatch query param port", "need", 9999, "got", p)
-		}
+		p := vec.Port()
+		assert.True(t, p == 9999, "port set failed: need 9999, got %d", p)
 	})
 
 	t.Run("forget query params", func(t *testing.T) {
 		vec.Reset()
 		_ = vec.Parse(query3)
-		if y := vec.Query().GetString("y"); y != "qwerty" {
-			t.Error("query 3 mismatch query param y", "need", "qwerty", "got", y)
-		}
+		y := vec.Query().GetString("y")
+		assert.True(t, y == "qwerty", "query 3 mismatch query param y: need qwerty, got %s", y)
 		vec.SetQueryBytes(query3repl)
 		vec.Query().Each(func(_ int, node *vector.Node) {
 			switch {
 			case node.KeyString() == "foo":
-				if node.String() != "x" {
-					t.Error("query 3 (forget) mismatch query param", node.KeyString(), "need", "x", "got", node.String())
-				}
+				assert.True(t, node.String() == "x", "query 3 (forget) mismatch query param %s: need x, got %s", node.KeyString(), node.String())
 			case node.KeyString() == "bar":
-				if node.String() != "y" {
-					t.Error("query 3 (forget) mismatch query param", node.KeyString(), "need", "y", "got", node.String())
-				}
+				assert.True(t, node.String() == "y", "query 3 (forget) mismatch query param %s: need y, got %s", node.KeyString(), node.String())
 			case node.KeyString() == "a[]":
-				if node.Limit() != 3 {
-					t.Error("query 2 (forget) unexpected length of param a[]", "need", 3, "got", node.Limit())
-				}
-				if node.At(0).String() != "1" {
-					t.Error("query 2 (forget) mismatch query param a[0]", "need", "1", "got", node.At(0).String())
-				}
+				assert.True(t, node.Limit() == 3, "query 2 (forget) unexpected length of param a[]: need 3, got %d", node.Limit())
+				assert.True(t, node.At(0).String() == "1", "query 2 (forget) mismatch query param a[0]: need 1, got %s", node.At(0).String())
 			}
 		})
 	})
@@ -343,18 +313,15 @@ func TestVector(t *testing.T) {
 			SetPathString("search").
 			SetQueryString("q=keys").
 			SetHashString("results")
-		if n := vec.Bytes(); !bytes.Equal(n, query3new) {
-			t.Error("url assembly failed", "need", string(query3new), "got", string(n))
-		}
+		n := vec.Bytes()
+		assert.True(t, bytes.Equal(n, query3new), "url assembly failed: need %s, got %s", string(query3new), string(n))
 	})
 
 	t.Run("query sort", func(t *testing.T) {
 		vec.Reset()
 		_ = vec.ParseCopy(query0)
 		mod := vec.QuerySort().QueryBytes()
-		if !bytes.Equal(mod, query0sorted) {
-			t.Error("query 0 sort failed", "\nneed", string(query0sorted), "\n got", string(mod))
-		}
+		assert.True(t, bytes.Equal(mod, query0sorted), "query 0 sort failed:\nneed %s\n got %s", string(query0sorted), string(mod))
 	})
 }
 
@@ -384,38 +351,36 @@ func BenchmarkVector(b *testing.B) {
 				b.Fatal(err)
 			}
 
-			if vec.SchemeString() != tst.target.scheme {
-				printErr(b, &tst, "scheme mismatch", vec.SchemeString(), "vs", tst.target.scheme)
+			assert.True(b, vec.SchemeString() == tst.target.scheme)
+			if tst.target.slashes {
+				assert.True(b, vec.Slashes() == tst.target.slashes, "slashes mismatch")
 			}
-			if tst.target.slashes && vec.Slashes() != tst.target.slashes {
-				printErr(b, &tst, "slashes mismatch", vec.Slashes(), "vs", tst.target.slashes)
+			if len(tst.target.auth) > 0 {
+				assert.True(b, vec.AuthString() == tst.target.auth, "auth mismatch")
 			}
-			if len(tst.target.auth) > 0 && vec.AuthString() != tst.target.auth {
-				printErr(b, &tst, "auth mismatch", vec.AuthString(), "vs", tst.target.auth)
+			if len(tst.target.username) > 0 {
+				assert.True(b, vec.UsernameString() == tst.target.username, "username mismatch")
 			}
-			if len(tst.target.username) > 0 && vec.UsernameString() != tst.target.username {
-				printErr(b, &tst, "username mismatch", vec.UsernameString(), "vs", tst.target.username)
+			if len(tst.target.password) > 0 {
+				assert.True(b, vec.PasswordString() == tst.target.password, "password mismatch")
 			}
-			if len(tst.target.password) > 0 && vec.PasswordString() != tst.target.password {
-				printErr(b, &tst, "password mismatch", vec.PasswordString(), "vs", tst.target.password)
+			if len(tst.target.host) > 0 {
+				assert.True(b, vec.HostString() == tst.target.host, "host mismatch")
 			}
-			if len(tst.target.host) > 0 && vec.HostString() != tst.target.host {
-				printErr(b, &tst, "host mismatch", vec.HostString(), "vs", tst.target.host)
+			if len(tst.target.hostname) > 0 {
+				assert.True(b, vec.HostnameString() == tst.target.hostname, "hostname mismatch")
 			}
-			if len(tst.target.hostname) > 0 && vec.HostnameString() != tst.target.hostname {
-				printErr(b, &tst, "hostname mismatch", vec.HostnameString(), "vs", tst.target.hostname)
+			if tst.target.port > 0 {
+				assert.True(b, vec.Port() == tst.target.port, "port mismatch")
 			}
-			if tst.target.port > 0 && vec.Port() != tst.target.port {
-				printErr(b, &tst, "port mismatch", vec.Port(), "vs", tst.target.port)
+			if len(tst.target.path) > 0 {
+				assert.True(b, vec.PathString() == tst.target.path, "path mismatch")
 			}
-			if len(tst.target.path) > 0 && vec.PathString() != tst.target.path {
-				printErr(b, &tst, "path mismatch", vec.PathString(), "vs", tst.target.path)
+			if len(tst.target.query) > 0 {
+				assert.True(b, vec.QueryString() == tst.target.query, "query mismatch")
 			}
-			if len(tst.target.query) > 0 && vec.QueryString() != tst.target.query {
-				printErr(b, &tst, "query mismatch", vec.QueryString(), "vs", tst.target.query)
-			}
-			if len(tst.target.hash) > 0 && vec.HashString() != tst.target.hash {
-				printErr(b, &tst, "hash mismatch", vec.HashString(), "vs", tst.target.hash)
+			if len(tst.target.hash) > 0 {
+				assert.True(b, vec.HashString() == tst.target.hash, "hash mismatch")
 			}
 		}
 	})
@@ -428,9 +393,7 @@ func BenchmarkVector(b *testing.B) {
 			query := vec.Query()
 			query.Each(func(_ int, node *vector.Node) {
 				k := node.KeyString()
-				if query0target[k] != node.String() {
-					b.Error("query0 mismatch query param", k, "need", query0target[k], "got", node.String())
-				}
+				assert.True(b, query0target[k] == node.String())
 			})
 		}
 	})
@@ -440,12 +403,8 @@ func BenchmarkVector(b *testing.B) {
 			vec.Reset()
 			_ = vec.ParseCopy(query1)
 			query := vec.Query()
-			if !query.Exists("x") || query.Get("x").String() != "" {
-				b.Error("query1 mismatch query param x")
-			}
-			if !query.Exists("z") || query.Get("z").String() != "" {
-				b.Error("query1 mismatch query param z")
-			}
+			assert.True(b, query.Exists("x") && query.Get("x").String() == "", "query1 mismatch query param x")
+			assert.True(b, query.Exists("z") && query.Get("z").String() == "", "query1 mismatch query param z")
 		}
 	})
 	b.Run("parse query/2", func(b *testing.B) {
@@ -457,23 +416,13 @@ func BenchmarkVector(b *testing.B) {
 			query.Each(func(_ int, node *vector.Node) {
 				switch {
 				case node.KeyString() == "b":
-					if node.String() != "x" {
-						b.Error("query 2 mismatch query param", node.KeyString(), "need", "x", "got", node.String())
-					}
+					assert.True(b, node.String() == "x")
 				case node.KeyString() == "arr[]":
-					if node.Limit() != 3 {
-						b.Error("query 2 unexpected length of param arr[]", "need", 3, "got", node.Limit())
-					}
-					if node.At(1).String() != "2" {
-						b.Error("query 2 mismatch query param arr[1]", "need", "2", "got", node.At(1).String())
-					}
+					assert.True(b, node.Limit() == 3, "query 2 unexpected length of param arr[]")
+					assert.True(b, node.At(1).String() == "2", "query 2 mismatch query param arr[1]")
 				case node.KeyString() == "arr1[]":
-					if node.Limit() != 3 {
-						b.Error("query 2 unexpected length of param arr1[]", "need", 3, "got", node.Limit())
-					}
-					if node.At(0).String() != "a" {
-						b.Error("query 2 mismatch query param arr1[0]", "need", "a", "got", node.At(0).String())
-					}
+					assert.True(b, node.Limit() == 3, "query 2 unexpected length of param arr1[]")
+					assert.True(b, node.At(0).String() == "a", "query 2 mismatch query param arr1[0]")
 				}
 			})
 		}
@@ -491,27 +440,18 @@ func BenchmarkVector(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
 			_ = vec.Parse(query3)
-			if y := vec.Query().GetString("y"); y != "qwerty" {
-				b.Error("query 3 mismatch query param y", "need", "qwerty", "got", y)
-			}
+			y := vec.Query().GetString("y")
+			assert.True(b, y == "qwerty")
 			vec.SetQueryBytes(query3repl)
 			vec.Query().Each(func(_ int, node *vector.Node) {
 				switch {
 				case node.KeyString() == "foo":
-					if node.String() != "x" {
-						b.Error("query 3 (forget) mismatch query param", node.KeyString(), "need", "x", "got", node.String())
-					}
+					assert.True(b, node.String() == "x")
 				case node.KeyString() == "bar":
-					if node.String() != "y" {
-						b.Error("query 3 (forget) mismatch query param", node.KeyString(), "need", "y", "got", node.String())
-					}
+					assert.True(b, node.String() == "y")
 				case node.KeyString() == "a[]":
-					if node.Limit() != 3 {
-						b.Error("query 2 (forget) unexpected length of param a[]", "need", 3, "got", node.Limit())
-					}
-					if node.At(0).String() != "1" {
-						b.Error("query 2 (forget) mismatch query param a[0]", "need", "1", "got", node.At(0).String())
-					}
+					assert.True(b, node.Limit() == 3, "query 2 (forget) unexpected length of param a[]")
+					assert.True(b, node.At(0).String() == "1", "query 2 (forget) mismatch query param a[0]")
 				}
 			})
 		}
@@ -532,9 +472,8 @@ func BenchmarkVector(b *testing.B) {
 				SetPathString("search").
 				SetQueryString("q=keys").
 				SetHashString("results")
-			if n := vec.Bytes(); !bytes.Equal(n, query3new) {
-				b.Error("url assembly failed", "need", string(query3new), "got", string(n))
-			}
+			n := vec.Bytes()
+			assert.True(b, bytes.Equal(n, query3new), "url assembly failed")
 		}
 	})
 
@@ -545,9 +484,7 @@ func BenchmarkVector(b *testing.B) {
 			vec.Reset()
 			_ = vec.ParseCopy(query0)
 			mod := vec.QuerySort().QueryBytes()
-			if !bytes.Equal(mod, query0sorted) {
-				b.Error("query 0 sort failed", "need", string(query0sorted), "got", string(mod))
-			}
+			assert.True(b, bytes.Equal(mod, query0sorted), "query 0 sort failed")
 		}
 	})
 
@@ -560,9 +497,7 @@ func BenchmarkVector(b *testing.B) {
 			vec.Query().RemoveIf(func(_ int, node *vector.Node) bool {
 				return strings.HasPrefix(node.KeyString(), "utm")
 			})
-			if vec.QuerySort().String() != queryRemoveExpect {
-				b.FailNow()
-			}
+			assert.True(b, vec.QuerySort().String() == queryRemoveExpect, "remove if failed")
 		}
 	})
 }
@@ -598,41 +533,37 @@ func benchSet(b *testing.B, cpy bool) {
 			SetQueryString("?x=1").
 			SetHashString("#anc")
 
-		if vec.SchemeString() != tst.target.scheme {
-			printErr(b, &tst, "scheme mismatch", vec.SchemeString(), "vs", tst.target.scheme)
+		assert.True(b, vec.SchemeString() == tst.target.scheme, "scheme mismatch")
+		if tst.target.slashes {
+			assert.True(b, vec.Slashes() == tst.target.slashes, "slashes mismatch")
 		}
-		if tst.target.slashes && vec.Slashes() != tst.target.slashes {
-			printErr(b, &tst, "slashes mismatch", vec.Slashes(), "vs", tst.target.slashes)
+		if len(tst.target.auth) > 0 {
+			assert.True(b, vec.AuthString() == tst.target.auth, "auth mismatch")
 		}
-		if len(tst.target.auth) > 0 && vec.AuthString() != tst.target.auth {
-			printErr(b, &tst, "auth mismatch", vec.AuthString(), "vs", tst.target.auth)
+		if len(tst.target.username) > 0 {
+			assert.True(b, vec.UsernameString() == tst.target.username, "username mismatch")
 		}
-		if len(tst.target.username) > 0 && vec.UsernameString() != tst.target.username {
-			printErr(b, &tst, "username mismatch", vec.UsernameString(), "vs", tst.target.username)
+		if len(tst.target.password) > 0 {
+			assert.True(b, vec.PasswordString() == tst.target.password, "password mismatch")
 		}
-		if len(tst.target.password) > 0 && vec.PasswordString() != tst.target.password {
-			printErr(b, &tst, "password mismatch", vec.PasswordString(), "vs", tst.target.password)
+		if len(tst.target.host) > 0 {
+			assert.True(b, vec.HostString() == tst.target.host, "host mismatch")
 		}
-		if len(tst.target.host) > 0 && vec.HostString() != tst.target.host {
-			printErr(b, &tst, "host mismatch", vec.HostString(), "vs", tst.target.host)
+		if len(tst.target.hostname) > 0 {
+			assert.True(b, vec.HostnameString() == tst.target.hostname, "hostname mismatch")
 		}
-		if len(tst.target.hostname) > 0 && vec.HostnameString() != tst.target.hostname {
-			printErr(b, &tst, "hostname mismatch", vec.HostnameString(), "vs", tst.target.hostname)
+		assert.True(b, vec.Port() == 9999, "port mismatch")
+		if tst.target.port > 0 {
+			assert.True(b, vec.Port() == tst.target.port, "port mismatch")
 		}
-		if vec.Port() != 9999 {
-			printErr(b, &tst, "port mismatch", vec.Port(), "vs", 9999)
+		if len(tst.target.path) > 0 {
+			assert.True(b, vec.PathString() == tst.target.path, "path mismatch")
 		}
-		if tst.target.port > 0 && vec.Port() != tst.target.port {
-			printErr(b, &tst, "port mismatch", vec.Port(), "vs", tst.target.port)
+		if len(tst.target.query) > 0 {
+			assert.True(b, vec.QueryString() == tst.target.query, "query mismatch")
 		}
-		if len(tst.target.path) > 0 && vec.PathString() != tst.target.path {
-			printErr(b, &tst, "path mismatch", vec.PathString(), "vs", tst.target.path)
-		}
-		if len(tst.target.query) > 0 && vec.QueryString() != tst.target.query {
-			printErr(b, &tst, "query mismatch", vec.QueryString(), "vs", tst.target.query)
-		}
-		if len(tst.target.hash) > 0 && vec.HashString() != tst.target.hash {
-			printErr(b, &tst, "hash mismatch", vec.HashString(), "vs", tst.target.hash)
+		if len(tst.target.hash) > 0 {
+			assert.True(b, vec.HashString() == tst.target.hash, "hash mismatch")
 		}
 	}
 }
