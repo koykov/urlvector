@@ -10,11 +10,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var dsStages []struct {
-	idx int
-	ds  string
-	src string
-}
+var (
+	dsStages []struct {
+		idx int
+		ds  string
+		src string
+	}
+	dsmidl int64
+)
 
 func init() {
 	files, err := filepath.Glob("dataset/*.txt")
@@ -32,11 +35,16 @@ func init() {
 		scr := bufio.NewScanner(file)
 		var c int
 		for scr.Scan() {
+			src := scr.Text()
 			dsStages = append(dsStages, struct {
 				idx     int
 				ds, src string
-			}{idx: c, ds: ds, src: scr.Text()})
+			}{idx: c, ds: ds, src: src})
+			dsmidl += int64(len(src))
 			c++
+		}
+		if c > 0 {
+			dsmidl /= int64(c)
 		}
 		_ = file.Close()
 	}
@@ -58,6 +66,7 @@ func BenchmarkDataset(b *testing.B) {
 		return
 	}
 	b.ReportAllocs()
+	b.SetBytes(dsmidl)
 	for i := 0; i < b.N; i++ {
 		stg := &dsStages[i%len(dsStages)]
 		vec := Acquire()

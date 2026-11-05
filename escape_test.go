@@ -118,6 +118,7 @@ func BenchmarkEscape(b *testing.B) {
 		b.Run("query/"+strconv.Itoa(i), func(b *testing.B) {
 			var buf []byte
 			b.ReportAllocs()
+			b.SetBytes(int64(len(stage.raw)))
 			for i := 0; i < b.N; i++ {
 				buf = QueryEscape(buf[:0], byteconv.S2B(stage.raw))
 				if r := byteconv.B2S(buf); r != stage.exp {
@@ -130,6 +131,7 @@ func BenchmarkEscape(b *testing.B) {
 		b.Run("path/"+strconv.Itoa(i), func(b *testing.B) {
 			var buf []byte
 			b.ReportAllocs()
+			b.SetBytes(int64(len(stage.raw)))
 			for i := 0; i < b.N; i++ {
 				buf = PathEscape(buf[:0], byteconv.S2B(stage.raw))
 				if r := byteconv.B2S(buf); r != stage.exp1 {
@@ -145,6 +147,7 @@ func BenchmarkUnescape(b *testing.B) {
 		b.Run("query/"+strconv.Itoa(i), func(b *testing.B) {
 			var buf []byte
 			b.ReportAllocs()
+			b.SetBytes(int64(len(stage.exp)))
 			for i := 0; i < b.N; i++ {
 				buf = QueryUnescape(buf[:0], byteconv.S2B(stage.exp))
 				if r := byteconv.B2S(buf); r != stage.raw {
@@ -157,6 +160,7 @@ func BenchmarkUnescape(b *testing.B) {
 		b.Run("path/"+strconv.Itoa(i), func(b *testing.B) {
 			var buf []byte
 			b.ReportAllocs()
+			b.SetBytes(int64(len(stage.exp)))
 			for i := 0; i < b.N; i++ {
 				buf = PathUnescape(buf[:0], byteconv.S2B(stage.exp1))
 				if r := byteconv.B2S(buf); r != stage.raw {
