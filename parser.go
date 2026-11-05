@@ -164,9 +164,9 @@ func (vec *Vector) parseAuth(depth, offset int, node *vector.Node) (int, error) 
 	n := len(src)
 	_ = src[n-1]
 
-	posCol := bytealg.IndexByteAtBytes(src, ':', offset)
-	posAt := bytealg.IndexByteAtBytes(src, '@', max_(posCol, offset))
-	if posSl := bytealg.IndexByteAtBytes(src, '/', offset); posSl >= 0 && posSl < posAt {
+	posCol := vector.IndexByteAt(src, ':', offset)
+	posAt := vector.IndexByteAt(src, '@', max_(posCol, offset))
+	if posSl := vector.IndexByteAt(src, '/', offset); posSl >= 0 && posSl < posAt {
 		posAt = -1
 	}
 
@@ -207,11 +207,11 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 	n := len(src)
 	_ = src[n-1]
 
-	posSl := bytealg.IndexByteAtBytes(src, '/', offset)
+	posSl := vector.IndexByteAt(src, '/', offset)
 	if posSl < 0 {
-		if posBSl := bytealg.IndexByteAtBytes(src, '\\', offset); posBSl >= 0 {
+		if posBSl := vector.IndexByteAt(src, '\\', offset); posBSl >= 0 {
 			posSl = posBSl
-		} else if posQM := bytealg.IndexByteAtBytes(src, '?', offset); posQM >= 0 {
+		} else if posQM := vector.IndexByteAt(src, '?', offset); posQM >= 0 {
 			posSl = posQM
 		} else {
 			posSl = n
@@ -220,7 +220,7 @@ func (vec *Vector) parseHost(depth, offset int, node *vector.Node) (int, error) 
 	posCol := -1
 	i := offset
 loop:
-	i = bytealg.IndexByteAtBytes(src, ':', i+1)
+	i = vector.IndexByteAt(src, ':', i+1)
 	if i >= 0 && i < posSl {
 		posCol = i
 		goto loop
@@ -261,8 +261,8 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 	_ = src[n-1]
 
 	if offset < n {
-		posQM := bytealg.IndexByteAtBytes(vec.Src(), '?', offset)
-		posHash := bytealg.IndexByteAtBytes(vec.Src(), '#', offset)
+		posQM := vector.IndexByteAt(vec.Src(), '?', offset)
+		posHash := vector.IndexByteAt(vec.Src(), '#', offset)
 		if posQM >= 0 && posHash >= 0 && posQM > posHash {
 			posQM = posHash
 		}
@@ -276,7 +276,7 @@ func (vec *Vector) parsePath(depth, offset int, node *vector.Node) (int, error) 
 		path.Key().Init(bKeys, offsetPath, lenPath)
 		val := src[offset:posQM]
 		path.Value().Init(src, offset, posQM-offset)
-		path.Value().SetBit(flagEscape, bytealg.IndexByteAtBytes(val, '%', 0) >= 0)
+		path.Value().SetBit(flagEscape, vector.IndexByteAt(val, '%', 0) >= 0)
 		offset = posQM
 	}
 
@@ -301,7 +301,7 @@ func (vec *Vector) parseQuery(depth, offset int, node *vector.Node) (int, error)
 	_ = src[n-1]
 
 	if offset < n {
-		posHash := bytealg.IndexByteAtBytes(src, '#', offset)
+		posHash := vector.IndexByteAt(src, '#', offset)
 		if posHash < 0 {
 			posHash = n
 		} else {
@@ -338,12 +338,12 @@ func (vec *Vector) parseQueryParams(query *vector.Node) {
 	for {
 		kv, k, v = nil, nil, nil
 
-		i := bytealg.IndexByteAtBytes(origin, '&', offset)
+		i := vector.IndexByteAt(origin, '&', offset)
 		if i < 0 {
 			i = len(origin)
 		}
 		kv = origin[offset:i]
-		j := bytealg.IndexByteAtBytes(kv, '=', 0)
+		j := vector.IndexByteAt(kv, '=', 0)
 		if j < 0 {
 			k = kv
 		} else {
