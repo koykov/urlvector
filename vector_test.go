@@ -345,6 +345,7 @@ func BenchmarkVector(b *testing.B) {
 		}
 
 		b.ReportAllocs()
+		b.SetBytes(int64(len(tst.url)))
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
 			if err := vec.ParseString(tst.url); err != nil {
@@ -387,6 +388,7 @@ func BenchmarkVector(b *testing.B) {
 
 	b.Run("parse query/0", func(b *testing.B) {
 		b.ReportAllocs()
+		b.SetBytes(int64(len(query0)))
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
 			_ = vec.ParseCopy(query0)
@@ -399,6 +401,7 @@ func BenchmarkVector(b *testing.B) {
 	})
 	b.Run("parse query/1", func(b *testing.B) {
 		b.ReportAllocs()
+		b.SetBytes(int64(len(query1)))
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
 			_ = vec.ParseCopy(query1)
@@ -409,6 +412,7 @@ func BenchmarkVector(b *testing.B) {
 	})
 	b.Run("parse query/2", func(b *testing.B) {
 		b.ReportAllocs()
+		b.SetBytes(int64(len(query2)))
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
 			_ = vec.ParseCopy(query2)
@@ -437,6 +441,7 @@ func BenchmarkVector(b *testing.B) {
 
 	b.Run("forget query params", func(b *testing.B) {
 		b.ReportAllocs()
+		b.SetBytes(int64(len(query3)))
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
 			_ = vec.Parse(query3)
@@ -459,6 +464,7 @@ func BenchmarkVector(b *testing.B) {
 
 	b.Run("serialize", func(b *testing.B) {
 		b.ReportAllocs()
+		b.SetBytes(int64(len(query3)))
 
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
@@ -479,6 +485,7 @@ func BenchmarkVector(b *testing.B) {
 
 	b.Run("query sort", func(b *testing.B) {
 		b.ReportAllocs()
+		b.SetBytes(int64(len(query0)))
 
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
@@ -490,6 +497,7 @@ func BenchmarkVector(b *testing.B) {
 
 	b.Run("remove if", func(b *testing.B) {
 		b.ReportAllocs()
+		b.SetBytes(int64(len(queryRemove)))
 
 		for i := 0; i < b.N; i++ {
 			vec.Reset()
@@ -517,6 +525,7 @@ func benchSet(b *testing.B, cpy bool) {
 	}
 
 	b.ReportAllocs()
+	b.SetBytes(int64(len(url0)))
 	for i := 0; i < b.N; i++ {
 		vec.Reset()
 		if cpy {
